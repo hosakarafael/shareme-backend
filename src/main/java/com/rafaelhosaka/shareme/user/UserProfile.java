@@ -1,6 +1,7 @@
 package com.rafaelhosaka.shareme.user;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 
@@ -23,6 +24,7 @@ public class UserProfile {
     @Column(unique = true)
     private String email;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate birthDate;
 
 }

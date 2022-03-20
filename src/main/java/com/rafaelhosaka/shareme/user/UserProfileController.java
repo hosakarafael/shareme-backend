@@ -18,7 +18,6 @@ public class UserProfileController {
     }
 
     @PostMapping("/save")
-    @ResponseBody
     public void saveUserProfile(@RequestBody UserProfile userProfile){
         this.userService.save(userProfile);
     }
