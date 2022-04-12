@@ -1,8 +1,8 @@
 package com.rafaelhosaka.shareme.user;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.UUID;
 
-public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> {
+public interface UserProfileRepository extends MongoRepository<UserProfile, UUID> {
 }
