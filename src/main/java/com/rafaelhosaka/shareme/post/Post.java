@@ -8,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +23,11 @@ public class Post {
 
     private LocalDateTime dateCreated;
 
-    public Post(String description) {
+    private String fileName; //S3 key
+
+    public Post(String description, LocalDateTime dateCreated, String fileName) {
         this.description = description;
+        this.dateCreated = dateCreated;
+        this.fileName = fileName;
     }
 }
