@@ -4,6 +4,7 @@ package com.rafaelhosaka.shareme.post;
 import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.filestore.FileStore;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,16 +14,11 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final FileStore fileStore;
-
-    @Autowired
-    public PostService(PostRepository postRepository, FileStore fileStore) {
-        this.postRepository = postRepository;
-        this.fileStore = fileStore;
-    }
 
     public List<Post> getAll() {
         return postRepository.findAll();
