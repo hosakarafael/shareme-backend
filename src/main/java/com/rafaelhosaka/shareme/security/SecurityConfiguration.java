@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -44,13 +45,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 cors.setAllowedHeaders(List.of("*"));
                 return cors;
         });
+
         http.sessionManagement().sessionCreationPolicy(STATELESS);
 
-        List<String> permitAllPaths = List.of("/error", "/api/auth/login/**", "/api/auth/refresh/**", "/api/post/download/**");
+        http.authorizeRequests().antMatchers(getPermitAllPaths()).permitAll();
 
-        http.authorizeRequests().antMatchers(permitAllPaths.toArray(new String[permitAllPaths.size()])).permitAll();
         http.authorizeRequests().antMatchers(GET, "/api/post/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(POST, "/api/post/upload").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
         http.authorizeRequests().antMatchers(GET, "/api/auth/**").hasAnyAuthority("ROLE_ADMIN");
+
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -60,5 +64,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception{
         return super.authenticationManagerBean();
+    }
+
+    public String[] getPermitAllPaths(){
+        return new String[]{
+                "/error",
+                "/api/auth/login/**",
+                "/api/auth/refresh/**",
+                "/api/post/download/**"
+                };
     }
 }
