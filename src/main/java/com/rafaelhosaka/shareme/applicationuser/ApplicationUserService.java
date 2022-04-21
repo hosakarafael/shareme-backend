@@ -2,6 +2,7 @@ package com.rafaelhosaka.shareme.applicationuser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,12 +16,18 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class ApplicationUserService implements UserDetailsService {
     private final ApplicationUserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
+
+    @Autowired
+    public ApplicationUserService(ApplicationUserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.encoder = encoder;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -33,9 +40,7 @@ public class ApplicationUserService implements UserDetailsService {
         }
 
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        applicationUser.getRoles().forEach(role -> {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        });
+        applicationUser.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
 
         return new User(applicationUser.getUsername(), applicationUser.getPassword(), authorities);
     }

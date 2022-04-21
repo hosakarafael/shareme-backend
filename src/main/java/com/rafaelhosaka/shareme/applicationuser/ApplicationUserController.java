@@ -9,6 +9,7 @@ import com.rafaelhosaka.shareme.jwt.JwtUtils;
 import com.rafaelhosaka.shareme.user.UserProfileService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,10 +27,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("api/auth")
-@RequiredArgsConstructor
 public class ApplicationUserController {
     private final ApplicationUserService userService;
     private final UserProfileService userProfileService;
+
+    @Autowired
+    public ApplicationUserController(ApplicationUserService userService, UserProfileService userProfileService) {
+        this.userService = userService;
+        this.userProfileService = userProfileService;
+    }
 
     @GetMapping("/user/{username}")
     public ResponseEntity<ApplicationUser> getUser(@PathVariable("username") String username){

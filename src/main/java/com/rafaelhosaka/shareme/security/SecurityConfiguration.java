@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.cors().configurationSource(request -> {
                 var cors = new CorsConfiguration();
-                cors.setAllowedOrigins(List.of("*"));
+                cors.setAllowedOrigins(List.of("http://localhost:3000"));
                 cors.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
                 cors.setAllowedHeaders(List.of("*"));
                 return cors;
@@ -52,6 +52,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests().antMatchers(GET, "/api/post/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(POST, "/api/post/upload").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
+        http.authorizeRequests().antMatchers(GET, "/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 
         http.authorizeRequests().antMatchers(GET, "/api/auth/**").hasAnyAuthority("ROLE_ADMIN");
 
