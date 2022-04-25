@@ -47,7 +47,7 @@ public class PostService {
             post = save(post);
 
             fileStore.upload(
-                    String.format("%s/%s", BucketName.PROFILE_IMAGE.getName(), post.getId()),
+                    String.format("%s/%s", BucketName.POSTS.getName(), post.getId()),
                     fileName,
                     Optional.of(fileStore.getMetadata(file)),
                     file.getInputStream());
@@ -61,7 +61,7 @@ public class PostService {
     public byte[] downloadPostImage(String postId) throws PostNotFoundException {
         Post post = getPostById(postId);
         return fileStore.download(
-                String.format("%s/%s", BucketName.PROFILE_IMAGE.getName(), postId) ,
+                String.format("%s/%s", BucketName.POSTS.getName(), postId) ,
                 post.getFileName());
     }
 

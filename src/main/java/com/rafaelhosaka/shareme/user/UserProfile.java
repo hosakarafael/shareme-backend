@@ -35,4 +35,6 @@ public class UserProfile {
 
     private LocalDate birthDate;
 
+    private String fileName;
+
 }

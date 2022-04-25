@@ -1,7 +1,8 @@
 package com.rafaelhosaka.shareme.bucket;
 
 public enum BucketName {
-    PROFILE_IMAGE("shareme-image-upload");
+    USERS("shareme-image-upload/users"),
+    POSTS("shareme-image-upload/posts");
 
     private String name;
 

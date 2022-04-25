@@ -15,6 +15,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -67,9 +68,9 @@ public class PostController {
     }
 
     @GetMapping("/download/{id}")
-    public byte[] downloadPostImage(@PathVariable("id") String id)  {
+    public ResponseEntity<byte[]> downloadPostImage(@PathVariable("id") String id)  {
         try {
-            return postService.downloadPostImage(id);
+            return ResponseEntity.ok().body(Base64.getEncoder().encode(postService.downloadPostImage(id)));
         }catch (PostNotFoundException e){
             log.error("Exception : {}",e.getMessage());
             return null;
