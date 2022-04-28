@@ -47,20 +47,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         });
 
         http.sessionManagement().sessionCreationPolicy(STATELESS);
+        authorizeRequests(http);
 
-        http.authorizeRequests().antMatchers(getPermitAllPaths()).permitAll();
-
-        http.authorizeRequests().antMatchers(GET, "/api/post/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(POST, "/api/post/upload").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
-
-        http.authorizeRequests().antMatchers(GET, "/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
-
-        http.authorizeRequests().antMatchers(GET, "/api/auth/**").hasAnyAuthority("ROLE_ADMIN");
-
-        http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
+
+
 
     @Bean
     @Override
@@ -68,12 +61,32 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    private void authorizeRequests(HttpSecurity http) throws Exception {
+        //all
+        http.authorizeRequests().antMatchers(getPermitAllPaths()).permitAll();
+
+        //post
+        http.authorizeRequests().antMatchers(GET, "/api/post/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(POST, "/api/post/upload").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
+        //user
+        http.authorizeRequests().antMatchers(GET, "/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
+        //auth
+        http.authorizeRequests().antMatchers(GET, "/api/auth/**").hasAnyAuthority("ROLE_ADMIN");
+
+        http.authorizeRequests().anyRequest().authenticated();
+
+    }
+
     public String[] getPermitAllPaths(){
         return new String[]{
                 "/error",
                 "/api/auth/login/**",
+                "/api/auth/user/save/**",
                 "/api/auth/refresh/**",
-                "/api/post/download/**"
+                "/api/post/download/**",
+                "/api/user/save/**"
                 };
     }
 }

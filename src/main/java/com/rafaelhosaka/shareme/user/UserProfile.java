@@ -37,4 +37,6 @@ public class UserProfile {
 
     private String fileName;
 
+    private Gender gender;
+
 }

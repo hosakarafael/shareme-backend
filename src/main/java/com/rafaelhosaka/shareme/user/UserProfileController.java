@@ -43,7 +43,7 @@ public class UserProfileController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("/save")
     public void saveUserProfile(@RequestBody UserProfile userProfile){
         userService.save(userProfile);
     }

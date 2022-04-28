@@ -48,7 +48,9 @@ public class ApplicationUserService implements UserDetailsService {
     public ApplicationUser saveUser(ApplicationUser user){
         log.info("save user {}",user.getUsername());
         user.setPassword(encoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        addRoleToUser(user.getUsername(), "ROLE_USER");
+        return user;
     }
 
     public Role saveRole(Role role){
