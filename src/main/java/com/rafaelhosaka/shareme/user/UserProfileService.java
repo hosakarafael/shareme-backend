@@ -4,6 +4,7 @@ import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
 import com.rafaelhosaka.shareme.post.Post;
+import com.rafaelhosaka.shareme.validator.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +38,31 @@ public class UserProfileService {
         );
     }
 
-    public void save(UserProfile userProfile) {
-        userRepository.save(userProfile);
+    public UserProfile save(UserProfile userProfile) {
+
+        if(userRepository.findUserProfileByEmail(userProfile.getEmail()).isPresent()){
+            throw new IllegalStateException("This email is already registered");
+        }
+
+        Validator validator = new Validator();
+        if(!validator.isValidDate(userProfile.getBirthDate())){
+            throw new IllegalStateException("Invalid date");
+        }
+        if(userProfile.getEmail().isEmpty()){
+            throw new IllegalStateException("Email cannot be empty");
+        }
+        if(userProfile.getFirstName().isEmpty()){
+            throw new IllegalStateException("First name cannot be empty");
+        }
+        if(userProfile.getLastName().isEmpty()){
+            throw new IllegalStateException("Last name cannot be empty");
+        }
+        if(userProfile.getGender().getName().equals("")){
+            throw new IllegalStateException("Gender cannot be empty");
+        }
+
+        return userRepository.save(userProfile);
+
     }
 
     public UserProfile findById(String userId) throws UserProfileNotFoundException {

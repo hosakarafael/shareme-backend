@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Base64;
 import java.util.List;
 
@@ -44,8 +46,13 @@ public class UserProfileController {
     }
 
     @PostMapping("/save")
-    public void saveUserProfile(@RequestBody UserProfile userProfile){
-        userService.save(userProfile);
+    public ResponseEntity<UserProfile> saveUserProfile(@RequestBody UserProfile userProfile){
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
+        try{
+            return ResponseEntity.created(uri).body(userService.save(userProfile));
+        }catch(IllegalStateException e){
+            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/download/{id}")

@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -29,12 +30,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("api/auth")
 public class ApplicationUserController {
     private final ApplicationUserService userService;
-    private final UserProfileService userProfileService;
 
     @Autowired
-    public ApplicationUserController(ApplicationUserService userService, UserProfileService userProfileService) {
+    public ApplicationUserController(ApplicationUserService userService) {
         this.userService = userService;
-        this.userProfileService = userProfileService;
     }
 
     @GetMapping("/user/{username}")
@@ -50,8 +49,11 @@ public class ApplicationUserController {
     @PostMapping("/user/save")
     public ResponseEntity<ApplicationUser> saveUser(@RequestBody ApplicationUser applicationUser){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth/user/save").toUriString());
-
-        return ResponseEntity.created(uri).body(userService.saveUser(applicationUser));
+        try {
+            return ResponseEntity.created(uri).body(userService.saveUser(applicationUser));
+        }catch(IllegalStateException e){
+            return new ResponseEntity(e.getMessage(), BAD_REQUEST);
+        }
     }
 
     @PostMapping("/role/save")

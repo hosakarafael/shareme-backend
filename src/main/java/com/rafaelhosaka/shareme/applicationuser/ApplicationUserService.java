@@ -47,9 +47,22 @@ public class ApplicationUserService implements UserDetailsService {
 
     public ApplicationUser saveUser(ApplicationUser user){
         log.info("save user {}",user.getUsername());
+        if(user.getUsername().isEmpty()){
+            throw new IllegalStateException("Username cannot be empty");
+        }
+
+        if(user.getPassword().isEmpty()) {
+            throw new IllegalStateException("Password cannot be empty");
+        }
+
+        if(userRepository.findByUsername(user.getUsername()) != null){
+            throw new IllegalStateException("This username is already registered");
+        }
+
         user.setPassword(encoder.encode(user.getPassword()));
         user = userRepository.save(user);
         addRoleToUser(user.getUsername(), "ROLE_USER");
+
         return user;
     }
 
