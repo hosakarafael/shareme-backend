@@ -6,12 +6,16 @@ import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
 
+import com.rafaelhosaka.shareme.like.Like;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.yaml.snakeyaml.util.ArrayUtils;
 
 
 import java.time.LocalDateTime;
@@ -71,5 +75,26 @@ public class PostService {
         return postRepository.findById(id).orElseThrow(
                 () ->  new PostNotFoundException("Post with ID "+id+" not found")
         );
+    }
+
+    public Post toggleLike(String userId, String postId) throws PostNotFoundException {
+        Post oldPost = postRepository.findById(postId).orElseThrow(
+                () ->  new PostNotFoundException("Post with ID "+postId+" not found")
+        );
+
+        boolean isNewLike = true;
+        List<Like> likes = new ArrayList<>();
+        for (Like like : oldPost.getLikes()) {
+            if (like.getUserId().equals(userId)) {
+                isNewLike = false;
+            } else {
+                likes.add(like);
+            }
+        }
+        if (isNewLike){
+            likes.add(new Like(userId));
+        }
+        oldPost.setLikes(likes);
+        return postRepository.save(oldPost);
     }
 }

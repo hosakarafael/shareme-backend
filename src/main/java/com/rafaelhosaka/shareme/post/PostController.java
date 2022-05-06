@@ -47,11 +47,20 @@ public class PostController {
         }
     }
 
+    @PutMapping("/toggleLike")
+    public ResponseEntity<Post> updatePost(@RequestPart("userId") String userId, @RequestPart("postId") String postId){
+        try {
+            return ResponseEntity.ok().body(postService.toggleLike(userId, postId));
+        }catch(PostNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping(
             path = "/upload",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
     )
-    public ResponseEntity<Post> save(@RequestPart("post") String json,@Nullable @RequestPart(value = "file", required = false) MultipartFile file) {
+    public ResponseEntity<Post> savePostWithImage(@RequestPart("post") String json,@Nullable @RequestPart(value = "file", required = false) MultipartFile file) {
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
         try {
@@ -73,6 +82,8 @@ public class PostController {
             return ResponseEntity.ok().body(Base64.getEncoder().encode(postService.downloadPostImage(id)));
         }catch (PostNotFoundException e){
             log.error("Exception : {}",e.getMessage());
+            return null;
+        }catch(IllegalStateException e){
             return null;
         }
     }
