@@ -1,10 +1,10 @@
-package com.rafaelhosaka.shareme.validator;
+package com.rafaelhosaka.shareme.utils;
 
 import java.time.LocalDate;
 import java.time.Year;
 
 public class Validator {
-    public boolean isValidDate(LocalDate date){
+    public static boolean isValidDate(LocalDate date){
         int day = date.getDayOfMonth();
         int month = date.getMonthValue();
         int year = date.getYear();

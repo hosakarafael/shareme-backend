@@ -3,13 +3,11 @@ package com.rafaelhosaka.shareme.user;
 import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
-import com.rafaelhosaka.shareme.post.Post;
-import com.rafaelhosaka.shareme.validator.Validator;
+import com.rafaelhosaka.shareme.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserProfileService {
@@ -44,8 +42,7 @@ public class UserProfileService {
             throw new IllegalStateException("This email is already registered");
         }
 
-        Validator validator = new Validator();
-        if(!validator.isValidDate(userProfile.getBirthDate())){
+        if(!Validator.isValidDate(userProfile.getBirthDate())){
             throw new IllegalStateException("Invalid date");
         }
         if(userProfile.getEmail().isEmpty()){

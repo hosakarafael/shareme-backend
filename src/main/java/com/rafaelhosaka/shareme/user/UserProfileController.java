@@ -34,10 +34,21 @@ public class UserProfileController {
         return userService.getUserProfiles();
     }
 
-    @GetMapping("/{email:.+}")
-    public ResponseEntity<UserProfile> getUserProfile(@PathVariable("email") String email){
+    @GetMapping("/email/{email:.+}")
+    public ResponseEntity<UserProfile> getUserByEmail(@PathVariable("email") String email){
         try {
             return ResponseEntity.ok().body(userService.getUserProfileByEmail(email));
+        }catch (UserProfileNotFoundException e){
+            log.error("Exception : {}",e.getMessage());
+            return new ResponseEntity(
+                    e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UserProfile> getUserById(@PathVariable("id") String id){
+        try {
+            return ResponseEntity.ok().body(userService.getUserProfileById(id));
         }catch (UserProfileNotFoundException e){
             log.error("Exception : {}",e.getMessage());
             return new ResponseEntity(

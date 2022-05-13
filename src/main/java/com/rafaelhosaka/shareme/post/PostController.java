@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.user.UserProfileService;
+import com.rafaelhosaka.shareme.utils.JsonConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,24 +48,13 @@ public class PostController {
         }
     }
 
-    @PutMapping("/toggleLike")
-    public ResponseEntity<Post> updatePost(@RequestPart("userId") String userId, @RequestPart("postId") String postId){
-        try {
-            return ResponseEntity.ok().body(postService.toggleLike(userId, postId));
-        }catch(PostNotFoundException e){
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @PostMapping(
             path = "/upload",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<Post> savePostWithImage(@RequestPart("post") String json,@Nullable @RequestPart(value = "file", required = false) MultipartFile file) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
         try {
-            Post post = mapper.readValue(json, Post.class);
+            Post post = (Post) JsonConverter.convertJsonToObject(json, Post.class);
             if(file != null) {
                 return ResponseEntity.ok().body(postService.savePostWithImage(post, file));
             }else{

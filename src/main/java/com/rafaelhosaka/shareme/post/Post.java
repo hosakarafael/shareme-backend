@@ -1,6 +1,7 @@
 package com.rafaelhosaka.shareme.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rafaelhosaka.shareme.comment.Comment;
 import com.rafaelhosaka.shareme.like.Like;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import lombok.AllArgsConstructor;
@@ -36,9 +37,14 @@ public class Post {
     @DBRef
     private UserProfile user;
 
+    @DBRef
+    private List<Comment> comments = new ArrayList<>();
+
     public int getLikeCount(){
         return likes.size();
     }
+
+    public int getCommentCount(){return comments.size();}
 
     public Post(String description, LocalDateTime dateCreated, String fileName) {
         this.description = description;

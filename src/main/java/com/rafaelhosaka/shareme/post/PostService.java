@@ -76,25 +76,4 @@ public class PostService {
                 () ->  new PostNotFoundException("Post with ID "+id+" not found")
         );
     }
-
-    public Post toggleLike(String userId, String postId) throws PostNotFoundException {
-        Post oldPost = postRepository.findById(postId).orElseThrow(
-                () ->  new PostNotFoundException("Post with ID "+postId+" not found")
-        );
-
-        boolean isNewLike = true;
-        List<Like> likes = new ArrayList<>();
-        for (Like like : oldPost.getLikes()) {
-            if (like.getUserId().equals(userId)) {
-                isNewLike = false;
-            } else {
-                likes.add(like);
-            }
-        }
-        if (isNewLike){
-            likes.add(new Like(userId));
-        }
-        oldPost.setLikes(likes);
-        return postRepository.save(oldPost);
-    }
 }

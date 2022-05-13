@@ -60,14 +60,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+
     private void authorizeRequests(HttpSecurity http) throws Exception {
         //all
         http.authorizeRequests().antMatchers(getPermitAllPaths()).permitAll();
 
+        //like
+        http.authorizeRequests().antMatchers(PUT, "/api/like/post").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
+        //comment
+        http.authorizeRequests().antMatchers(PUT, "/api/comment/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
         //post
         http.authorizeRequests().antMatchers(GET, "/api/post/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(POST, "/api/post/upload").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(PUT, "/api/post/toggleLike").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 
         //user
         http.authorizeRequests().antMatchers(GET, "/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
