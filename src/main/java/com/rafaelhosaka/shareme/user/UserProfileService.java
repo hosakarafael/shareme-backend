@@ -3,11 +3,16 @@ package com.rafaelhosaka.shareme.user;
 import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
+import com.rafaelhosaka.shareme.post.Post;
 import com.rafaelhosaka.shareme.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserProfileService {
@@ -73,5 +78,26 @@ public class UserProfileService {
         return fileStore.download(
                 String.format("%s/%s", BucketName.USERS.getName(), userId) ,
                 user.getFileName());
+    }
+
+    public UserProfile uploadProfileImage(String userId, MultipartFile file) throws UserProfileNotFoundException {
+        UserProfile user = userRepository.findById(userId).orElseThrow(
+                        () -> new UserProfileNotFoundException("User with ID "+userId+" not found")
+                    );
+        try {
+            String fileName =  String.format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
+            user.setFileName(fileName);
+            userRepository.save(user);
+
+            fileStore.upload(
+                    String.format("%s/%s", BucketName.USERS.getName(), user.getId()),
+                    fileName,
+                    Optional.of(fileStore.getMetadata(file)),
+                    file.getInputStream());
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return user;
     }
 }

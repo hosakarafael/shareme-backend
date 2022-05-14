@@ -1,16 +1,13 @@
 package com.rafaelhosaka.shareme.user;
 
-import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -67,12 +64,25 @@ public class UserProfileController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadPostImage(@PathVariable("id") String id)  {
+    public ResponseEntity<byte[]> downloadProfileUserImage(@PathVariable("id") String id)  {
         try {
             return ResponseEntity.ok().body(Base64.getEncoder().encode(userService.downloadProfileImage(id)));
         }catch (Exception e){
             log.error("Exception : {}",e.getMessage());
             return ResponseEntity.noContent().build();
+        }
+    }
+
+    @PutMapping(
+            path = "/upload",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
+    public ResponseEntity<UserProfile> uploadProfileUserImage(@RequestPart("userId") String userId, @RequestPart(value = "file") MultipartFile file) {
+        try {
+            return ResponseEntity.ok().body(userService.uploadProfileImage(userId, file));
+        } catch (Exception e) {
+            log.error("Exception : {}",e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
