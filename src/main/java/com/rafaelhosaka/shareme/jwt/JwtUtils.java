@@ -12,8 +12,8 @@ import static java.util.Arrays.stream;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class JwtUtils {
-    private final long ACCESS_TOKEN_EXPIRE = 10 * 60 * 1000;
-    private final long REFRESH_TOKEN_EXPIRE = 30 * 60 * 1000;
+    private final long ACCESS_TOKEN_EXPIRE = 60 * 60 * 1000;
+    private final long REFRESH_TOKEN_EXPIRE = 1440 * 60 * 1000;
 
     public String createAccessToken(String username, String issuer, List<String> claim){
         return JWT.create()
