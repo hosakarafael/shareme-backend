@@ -31,6 +31,11 @@ public class UserProfileController {
         return userService.getUserProfiles();
     }
 
+    @GetMapping("/search/name")
+    public ResponseEntity<List<UserProfile>> searchUsersContainsName(@RequestParam("query") String searchedName) {
+        return ResponseEntity.ok(userService.searchUsersContainsName(searchedName));
+    }
+
     @GetMapping("/email/{email:.+}")
     public ResponseEntity<UserProfile> getUserByEmail(@PathVariable("email") String email){
         try {

@@ -4,6 +4,7 @@ import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
 import com.rafaelhosaka.shareme.post.Post;
+import com.rafaelhosaka.shareme.utils.Format;
 import com.rafaelhosaka.shareme.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -99,5 +100,14 @@ public class UserProfileService {
             e.printStackTrace();
         }
         return user;
+    }
+
+    public List<UserProfile> searchUsersContainsName(String searchedName) {
+        try {
+            return userRepository.searchUsersContainsName(Format.escapeMetaCharacters(searchedName));
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }
