@@ -44,4 +44,14 @@ public class FriendController {
     public ResponseEntity<FriendRequest> getFriendRequestFromIds(@RequestParam("targetUserId") String targetUserId, @RequestParam("requestingUserId") String requestingUserId){
         return ResponseEntity.ok().body(friendService.getFriendRequestFromIds(targetUserId, requestingUserId));
     }
+
+    @GetMapping("/isRequested")
+    public boolean isRequested(@RequestParam("requestingUserId") String requestingUserId,@RequestParam("targetUserId") String targetUserId){
+        return friendService.isRequested(requestingUserId, targetUserId);
+    }
+
+    @GetMapping("/isPending")
+    public boolean isPending(@RequestParam("requestingUserId") String requestingUserId,@RequestParam("targetUserId") String targetUserId){
+        return friendService.isPending(requestingUserId, targetUserId);
+    }
 }

@@ -33,4 +33,24 @@ public class FriendService {
     public FriendRequest getFriendRequestFromIds(String targetUserId, String requestingUserId) {
         return friendRequestRepository.getFriendRequestFromIds(targetUserId, requestingUserId);
     }
+
+    public boolean isRequested(String requestingUserId, String targetUserId) {
+        List<FriendRequest> requestedUsers = friendRequestRepository.getRequestedUsers(requestingUserId);
+        for (FriendRequest request: requestedUsers) {
+            if(request.getTargetUserId().equals(targetUserId)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isPending(String requestingUserId, String targetUserId) {
+        List<FriendRequest> pendingUsers = friendRequestRepository.getPendingFriendRequest(targetUserId);
+        for (FriendRequest request: pendingUsers) {
+            if(request.getRequestingUserId().equals(requestingUserId)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
