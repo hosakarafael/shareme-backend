@@ -40,12 +40,6 @@ public class Post {
     @DBRef
     private List<Comment> comments = new ArrayList<>();
 
-    public int getLikeCount(){
-        return likes.size();
-    }
-
-    public int getCommentCount(){return comments.size();}
-
     public Post(String description, LocalDateTime dateCreated, String fileName) {
         this.description = description;
         this.dateCreated = dateCreated;

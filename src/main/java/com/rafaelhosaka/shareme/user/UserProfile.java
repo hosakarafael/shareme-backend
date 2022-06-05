@@ -41,11 +41,5 @@ public class UserProfile {
 
     private List<String> friends = new ArrayList<>();
 
-    public int getFriendCount(){
-        return friends.size();
-    }
 
-    public String getFullName(){
-            return this.firstName + " " + this.lastName;
-        }
 }
