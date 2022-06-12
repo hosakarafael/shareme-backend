@@ -1,5 +1,7 @@
 package com.rafaelhosaka.shareme.friend;
 
+import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
+import com.rafaelhosaka.shareme.user.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,4 +56,15 @@ public class FriendController {
     public boolean isPending(@RequestParam("requestingUserId") String requestingUserId,@RequestParam("targetUserId") String targetUserId){
         return friendService.isPending(requestingUserId, targetUserId);
     }
+
+    @PostMapping("/acceptRequest")
+    public ResponseEntity<UserProfile> acceptRequest(@RequestBody FriendRequest friendRequest){
+        try {
+            return ResponseEntity.ok(friendService.acceptRequest(friendRequest));
+        }catch(IllegalStateException | UserProfileNotFoundException e){
+            e.printStackTrace();
+            return ResponseEntity.noContent().build();
+        }
+    }
+
 }

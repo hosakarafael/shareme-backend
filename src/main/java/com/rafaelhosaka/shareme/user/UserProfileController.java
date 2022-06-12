@@ -91,4 +91,9 @@ public class UserProfileController {
         }
     }
 
+    @PostMapping("getUsersFromIds")
+    public ResponseEntity<List<UserProfile>> getUsersFromIds(@RequestBody List<String> ids){
+        return ResponseEntity.ok(userService.getUserProfileFromIds(ids));
+    }
+
 }

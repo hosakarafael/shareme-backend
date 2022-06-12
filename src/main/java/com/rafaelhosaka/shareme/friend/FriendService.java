@@ -1,5 +1,8 @@
 package com.rafaelhosaka.shareme.friend;
 
+import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
+import com.rafaelhosaka.shareme.user.UserProfile;
+import com.rafaelhosaka.shareme.user.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +12,12 @@ import java.util.List;
 public class FriendService {
     private FriendRequestRepository friendRequestRepository;
 
+    private UserProfileService userProfileService;
+
     @Autowired
-    public FriendService(FriendRequestRepository friendRequestRepository) {
+    public FriendService(FriendRequestRepository friendRequestRepository, UserProfileService userProfileService) {
         this.friendRequestRepository = friendRequestRepository;
+        this.userProfileService = userProfileService;
     }
 
     public List<FriendRequest> getRequestedUsers(String requestingUserId){
@@ -52,5 +58,24 @@ public class FriendService {
             }
         }
         return false;
+    }
+
+    public UserProfile acceptRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
+        if(!friendRequestRepository.findById(friendRequest.getId()).isPresent()) {
+            throw new IllegalStateException("FriendRequest does not exist");
+        }
+
+        UserProfile requestingUser = userProfileService.getUserProfileById(friendRequest.getRequestingUserId());
+        UserProfile targetUser = userProfileService.getUserProfileById(friendRequest.getTargetUserId());
+
+        requestingUser.getFriends().add(targetUser.getId());
+        targetUser.getFriends().add(requestingUser.getId());
+
+        userProfileService.update(requestingUser);
+        userProfileService.update(targetUser);
+
+        deleteFriendRequest(friendRequest);
+
+        return requestingUser;
     }
 }

@@ -53,7 +53,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     filterChain.doFilter(request, response);
                 }catch(TokenExpiredException e){
                     errorMessage = e.getMessage();
-                    response.setStatus(UNAUTHORIZED.value());
+                    response.setStatus(FORBIDDEN.value());
                 }catch(Exception e){
                     errorMessage = e.getMessage();
                     response.setStatus(FORBIDDEN.value());

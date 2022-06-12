@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,6 +69,10 @@ public class UserProfileService {
 
     }
 
+    public UserProfile update(UserProfile userProfile){
+        return userRepository.save(userProfile);
+    }
+
     public UserProfile findById(String userId) throws UserProfileNotFoundException {
         return userRepository.findById(userId).orElseThrow(
                 () ->  new UserProfileNotFoundException("User with ID "+userId+" not found")
@@ -109,5 +114,18 @@ public class UserProfileService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<UserProfile> getUserProfileFromIds(List<String> ids) {
+        List users = new ArrayList();
+
+        for (String id: ids) {
+            Optional user = userRepository.findById(id);
+            if(user.isPresent()){
+                users.add(user);
+            }
+        }
+
+        return users;
     }
 }
