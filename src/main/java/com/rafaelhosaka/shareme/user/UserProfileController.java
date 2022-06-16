@@ -96,4 +96,9 @@ public class UserProfileController {
         return ResponseEntity.ok(userService.getUserProfileFromIds(ids));
     }
 
+    @PutMapping("/updateUser")
+    public ResponseEntity<UserProfile> updateUser(@RequestBody UserProfile user){
+        return ResponseEntity.ok(userService.update(user));
+    }
+
 }
