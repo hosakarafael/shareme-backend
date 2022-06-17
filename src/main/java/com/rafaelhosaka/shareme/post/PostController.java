@@ -48,6 +48,11 @@ public class PostController {
         }
     }
 
+    @PostMapping("/getPostsByUsersId")
+    public ResponseEntity<List<Post>> getPostsByUsersId(@RequestBody List<String> usersIds){
+        return ResponseEntity.ok(postService.getPostsByUsers(usersIds));
+    }
+
     @PostMapping(
             path = "/upload",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}

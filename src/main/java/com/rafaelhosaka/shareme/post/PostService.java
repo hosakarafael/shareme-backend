@@ -76,4 +76,12 @@ public class PostService {
                 () ->  new PostNotFoundException("Post with ID "+id+" not found")
         );
     }
+
+    public List<Post> getPostsByUsers(List<String> usersIds) {
+        List<Post> posts = new ArrayList<>();
+        for (String id: usersIds) {
+            posts.addAll(postRepository.getPostByUserId(id));
+        }
+        return posts;
+    }
 }
