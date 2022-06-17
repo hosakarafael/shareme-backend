@@ -65,6 +65,8 @@ public class UserProfileService {
             throw new IllegalStateException("Gender cannot be empty");
         }
 
+        userProfile.setThemePreference(ThemePreference.DEVICE);
+
         return userRepository.save(userProfile);
 
     }

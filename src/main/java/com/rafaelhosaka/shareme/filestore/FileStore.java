@@ -45,11 +45,11 @@ public class FileStore {
 
     public byte[] download(String path, String key){
         try{
-            if(key != null) {
+            if(key == null || key.isEmpty() ) {
+                return new byte[0];
+            }else{
                 S3Object object = s3.getObject(path, key);
                 return IOUtils.toByteArray(object.getObjectContent());
-            }else{
-                return new byte[0];
             }
         }catch (Exception e){
             throw  new IllegalStateException(e);

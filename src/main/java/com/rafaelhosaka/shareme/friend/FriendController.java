@@ -58,7 +58,7 @@ public class FriendController {
     }
 
     @PostMapping("/acceptRequest")
-    public ResponseEntity<UserProfile> acceptRequest(@RequestBody FriendRequest friendRequest){
+    public ResponseEntity<List<UserProfile>> acceptRequest(@RequestBody FriendRequest friendRequest){
         try {
             return ResponseEntity.ok(friendService.acceptRequest(friendRequest));
         }catch(IllegalStateException | UserProfileNotFoundException e){

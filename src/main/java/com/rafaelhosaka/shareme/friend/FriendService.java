@@ -6,6 +6,7 @@ import com.rafaelhosaka.shareme.user.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -60,7 +61,7 @@ public class FriendService {
         return false;
     }
 
-    public UserProfile acceptRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
+    public List<UserProfile> acceptRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
         if(!friendRequestRepository.findById(friendRequest.getId()).isPresent()) {
             throw new IllegalStateException("FriendRequest does not exist");
         }
@@ -76,6 +77,11 @@ public class FriendService {
 
         deleteFriendRequest(friendRequest);
 
-        return requestingUser;
+        List<UserProfile> modifiedUsers = new ArrayList<>();
+
+        modifiedUsers.add(requestingUser);
+        modifiedUsers.add(targetUser);
+
+        return modifiedUsers;
     }
 }
