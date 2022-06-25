@@ -78,6 +78,16 @@ public class UserProfileController {
         }
     }
 
+    @GetMapping("/downloadCoverImage/{id}")
+    public ResponseEntity<byte[]> downloadCoverImage(@PathVariable("id") String id)  {
+        try {
+            return ResponseEntity.ok().body(Base64.getEncoder().encode(userService.downloadCoverImage(id)));
+        }catch (Exception e){
+            log.error("Exception : {}",e.getMessage());
+            return ResponseEntity.noContent().build();
+        }
+    }
+
     @PutMapping(
             path = "/upload",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
@@ -85,6 +95,19 @@ public class UserProfileController {
     public ResponseEntity<UserProfile> uploadProfileUserImage(@RequestPart("userId") String userId, @RequestPart(value = "file") MultipartFile file) {
         try {
             return ResponseEntity.ok().body(userService.uploadProfileImage(userId, file));
+        } catch (Exception e) {
+            log.error("Exception : {}",e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping(
+            path = "/uploadCoverImage",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
+    public ResponseEntity<UserProfile> uploadCoverImage(@RequestPart("userId") String userId, @RequestPart(value = "file") MultipartFile file) {
+        try {
+            return ResponseEntity.ok().body(userService.uploadCoverImage(userId, file));
         } catch (Exception e) {
             log.error("Exception : {}",e.getMessage());
             return ResponseEntity.badRequest().build();

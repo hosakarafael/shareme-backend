@@ -37,6 +37,8 @@ public class UserProfile {
 
     private String fileName;
 
+    private String coverFileName;
+
     private Gender gender;
 
     private List<String> friends = new ArrayList<>();

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +89,28 @@ public class UserProfileService {
                 user.getFileName());
     }
 
+    public byte[] downloadCoverImage(String userId) throws UserProfileNotFoundException , IllegalStateException{
+        UserProfile user = getUserProfileById(userId);
+        return fileStore.download(
+                String.format("%s/%s", BucketName.USERS.getName(), userId) ,
+                user.getCoverFileName());
+    }
+
+    public UserProfile uploadCoverImage(String userId, MultipartFile file) throws UserProfileNotFoundException {
+        UserProfile user = userRepository.findById(userId).orElseThrow(
+                () -> new UserProfileNotFoundException("User with ID "+userId+" not found")
+        );
+        try {
+            String fileName =  String.format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
+            user.setCoverFileName(fileName);
+            userRepository.save(user);
+            upload(user,fileName, file);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return user;
+    }
+
     public UserProfile uploadProfileImage(String userId, MultipartFile file) throws UserProfileNotFoundException {
         UserProfile user = userRepository.findById(userId).orElseThrow(
                         () -> new UserProfileNotFoundException("User with ID "+userId+" not found")
@@ -96,17 +119,19 @@ public class UserProfileService {
             String fileName =  String.format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
             user.setFileName(fileName);
             userRepository.save(user);
-
-            fileStore.upload(
-                    String.format("%s/%s", BucketName.USERS.getName(), user.getId()),
-                    fileName,
-                    Optional.of(fileStore.getMetadata(file)),
-                    file.getInputStream());
-
+            upload(user,fileName, file);
         }catch (Exception e){
             e.printStackTrace();
         }
         return user;
+    }
+
+    public void upload(UserProfile user, String fileName, MultipartFile file) throws IOException {
+        fileStore.upload(
+                String.format("%s/%s", BucketName.USERS.getName(), user.getId()),
+                fileName,
+                Optional.of(fileStore.getMetadata(file)),
+                file.getInputStream());
     }
 
     public List<UserProfile> searchUsersContainsName(String searchedName) {
