@@ -2,7 +2,9 @@ package com.rafaelhosaka.shareme.friend;
 
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.user.UserProfile;
+import com.rafaelhosaka.shareme.utils.JsonConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -65,6 +67,18 @@ public class FriendController {
             e.printStackTrace();
             return ResponseEntity.noContent().build();
         }
+    }
+
+    @PutMapping( path = "/unfriend")
+    public ResponseEntity<List<UserProfile>> unfriend(@RequestPart("user1") String user1JSON, @RequestPart("user2") String user2JSON){
+        try {
+            UserProfile user1 = (UserProfile) JsonConverter.convertJsonToObject(user1JSON, UserProfile.class);
+            UserProfile user2 = (UserProfile) JsonConverter.convertJsonToObject(user2JSON, UserProfile.class);
+            return ResponseEntity.ok(friendService.unfriend(user1, user2));
+        }catch(Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
 }

@@ -84,4 +84,19 @@ public class FriendService {
 
         return modifiedUsers;
     }
+
+    public List<UserProfile> unfriend(UserProfile user1, UserProfile user2) {
+        user1.getFriends().remove(user2.getId());
+        user2.getFriends().remove(user1.getId());
+
+        userProfileService.update(user1);
+        userProfileService.update(user2);
+
+        List<UserProfile> modifiedUsers = new ArrayList<>();
+
+        modifiedUsers.add(user1);
+        modifiedUsers.add(user2);
+
+        return modifiedUsers;
+    }
 }
