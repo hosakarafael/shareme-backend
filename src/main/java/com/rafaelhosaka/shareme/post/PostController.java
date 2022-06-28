@@ -82,4 +82,9 @@ public class PostController {
             return null;
         }
     }
+    
+    @DeleteMapping("/delete")
+    public void deletePost(@RequestBody Post post) {
+        postService.deletePost(post);
+    }
 }

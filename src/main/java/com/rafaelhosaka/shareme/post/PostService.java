@@ -84,4 +84,12 @@ public class PostService {
         }
         return posts;
     }
+
+    public void deletePost(Post post) {
+        if(post.getFileName() != null && !post.getFileName().isEmpty()) {
+            fileStore.delete(String.format("%s/%s", BucketName.POSTS.getName(), post.getId()), post.getFileName());
+        }
+
+        postRepository.delete(post);
+    }
 }

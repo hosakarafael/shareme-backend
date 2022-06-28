@@ -56,6 +56,10 @@ public class FileStore {
         }
     }
 
+    public void delete(String path, String key){
+        s3.deleteObject(path, key);
+    }
+
     public Map<String, String> getMetadata(MultipartFile file){
         Map<String, String> metadata =  new HashMap<>();
         metadata.put("Content-Type", file.getContentType());
