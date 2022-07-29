@@ -1,5 +1,7 @@
 package com.rafaelhosaka.shareme.like;
 
+import com.rafaelhosaka.shareme.comment.Comment;
+import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.post.Post;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,19 @@ public class LikeController {
     }
 
     @PutMapping("/post")
-    public ResponseEntity<Post> likePost(@RequestPart("userId") String userId, @RequestPart("postId") String postId){
+    public ResponseEntity<Post> likeUnlikePost(@RequestPart("userId") String userId, @RequestPart("postId") String postId){
         try {
-            return ResponseEntity.ok().body(likeService.likePost(userId, postId));
+            return ResponseEntity.ok().body(likeService.likeUnlikePost(userId, postId));
         }catch(PostNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/comment")
+    public ResponseEntity<Comment> likeUnlikeComment(@RequestPart("userId") String userId, @RequestPart("commentId") String postId){
+        try {
+            return ResponseEntity.ok().body(likeService.likeUnlikeComment(userId, postId));
+        }catch(CommentNotFoundException e){
             return ResponseEntity.notFound().build();
         }
     }
