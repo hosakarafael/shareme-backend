@@ -1,6 +1,7 @@
 package com.rafaelhosaka.shareme.comment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.post.Post;
 import com.rafaelhosaka.shareme.utils.JsonConverter;
@@ -26,6 +27,17 @@ public class CommentController {
             Comment comment = (Comment) JsonConverter.convertJsonToObject(commentJson, Comment.class);
             return ResponseEntity.ok().body(commentService.newComment(comment, postId ));
         } catch (JsonProcessingException  | PostNotFoundException e) {
+            log.error("Exception : {}",e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/reply")
+    private ResponseEntity<Comment> replyComment(@RequestPart("parentCommentId") String parentCommentId, @RequestPart("comment")String commentJson){
+        try {
+            Comment comment = (Comment) JsonConverter.convertJsonToObject(commentJson, Comment.class);
+            return ResponseEntity.ok().body(commentService.replyComment(comment, parentCommentId ));
+        } catch (JsonProcessingException  | CommentNotFoundException e) {
             log.error("Exception : {}",e.getMessage());
             return ResponseEntity.badRequest().build();
         }
