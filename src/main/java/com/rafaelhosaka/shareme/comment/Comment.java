@@ -19,6 +19,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class Comment extends BaseComment{
 
+    private String parentId;
+
     @DBRef
     private List<BaseComment> subComments;
 

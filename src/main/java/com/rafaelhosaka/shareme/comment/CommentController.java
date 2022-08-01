@@ -42,4 +42,14 @@ public class CommentController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+
+    @DeleteMapping("/delete")
+    public void deleteComment(@RequestPart("commentId") String commentId, @RequestPart("postId")String postId) {
+        try {
+            commentService.deleteComment(commentId, postId);
+        } catch (CommentNotFoundException | PostNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
