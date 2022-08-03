@@ -2,6 +2,10 @@ package com.rafaelhosaka.shareme.post;
 
 
 import com.rafaelhosaka.shareme.bucket.BucketName;
+import com.rafaelhosaka.shareme.comment.Comment;
+import com.rafaelhosaka.shareme.comment.CommentRepository;
+import com.rafaelhosaka.shareme.comment.CommentService;
+import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
 
@@ -17,11 +21,13 @@ import java.util.*;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CommentService commentService;
     private final FileStore fileStore;
 
     @Autowired
-    public PostService(PostRepository postRepository, FileStore fileStore) {
+    public PostService(PostRepository postRepository, CommentService commentService, FileStore fileStore) {
         this.postRepository = postRepository;
+        this.commentService = commentService;
         this.fileStore = fileStore;
     }
 
@@ -77,9 +83,15 @@ public class PostService {
         return posts;
     }
 
-    public void deletePost(Post post) {
+    public void deletePost(String postId) throws PostNotFoundException, CommentNotFoundException {
+        Post post = getPostById(postId);
+
         if(post.getFileName() != null && !post.getFileName().isEmpty()) {
             fileStore.delete(String.format("%s/%s", BucketName.POSTS.getName(), post.getId()), post.getFileName());
+        }
+
+        for(Comment comment : post.getComments()){
+            commentService.deleteComment(comment.getId(),post.getId());
         }
 
         postRepository.delete(post);

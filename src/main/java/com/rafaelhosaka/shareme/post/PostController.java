@@ -3,6 +3,7 @@ package com.rafaelhosaka.shareme.post;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.user.UserProfileService;
 import com.rafaelhosaka.shareme.utils.JsonConverter;
@@ -84,7 +85,13 @@ public class PostController {
     }
     
     @DeleteMapping("/delete")
-    public void deletePost(@RequestBody Post post) {
-        postService.deletePost(post);
+    public void deletePost(@RequestBody String postId) {
+        try {
+            postService.deletePost(postId);
+        } catch (PostNotFoundException e) {
+            e.printStackTrace();
+        } catch (CommentNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
