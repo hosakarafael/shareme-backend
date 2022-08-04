@@ -68,6 +68,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //like
         http.authorizeRequests().antMatchers(PUT, "/api/like/post").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 
+        //share
+        http.authorizeRequests().antMatchers(POST, "/api/share/post/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(GET, "/api/share/post/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
         //comment
         http.authorizeRequests().antMatchers(PUT, "/api/comment/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 
