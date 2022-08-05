@@ -3,35 +3,41 @@ package com.rafaelhosaka.shareme.post;
 
 import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.comment.Comment;
-import com.rafaelhosaka.shareme.comment.CommentRepository;
 import com.rafaelhosaka.shareme.comment.CommentService;
 import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
+import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
 
+import com.rafaelhosaka.shareme.user.UserProfile;
+import com.rafaelhosaka.shareme.user.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
 
     private final PostRepository postRepository;
     private final CommentService commentService;
+    private final UserProfileRepository userRepository;
     private final FileStore fileStore;
 
     @Autowired
-    public PostService(PostRepository postRepository, CommentService commentService, FileStore fileStore) {
+    public PostService(PostRepository postRepository, CommentService commentService, FileStore fileStore, UserProfileRepository userRepository) {
         this.postRepository = postRepository;
         this.commentService = commentService;
         this.fileStore = fileStore;
+        this.userRepository = userRepository;
     }
 
-    public List<Post> getAll() {
+    public List<BasePost> getAll() {
         return postRepository.findAll();
     }
 
@@ -61,7 +67,7 @@ public class PostService {
     }
 
     public byte[] downloadPostImage(String postId) throws PostNotFoundException {
-        Post post = getPostById(postId);
+        Post post = (Post) getPostById(postId);
         return fileStore.download(
                 String.format("%s/%s", BucketName.POSTS.getName(), postId) ,
                 post.getFileName());
@@ -69,14 +75,14 @@ public class PostService {
 
 
 
-    public Post getPostById(String id) throws PostNotFoundException {
+    public BasePost getPostById(String id) throws PostNotFoundException {
         return postRepository.findById(id).orElseThrow(
                 () ->  new PostNotFoundException("Post with ID "+id+" not found")
         );
     }
 
-    public List<Post> getPostsByUsers(List<String> usersIds) {
-        List<Post> posts = new ArrayList<>();
+    public List<BasePost> getPostsByUsers(List<String> usersIds) {
+        List<BasePost> posts = new ArrayList<>();
         for (String id: usersIds) {
             posts.addAll(postRepository.getPostByUserId(id));
         }
@@ -84,10 +90,17 @@ public class PostService {
     }
 
     public void deletePost(String postId) throws PostNotFoundException, CommentNotFoundException {
-        Post post = getPostById(postId);
+        BasePost post = getPostById(postId);
 
-        if(post.getFileName() != null && !post.getFileName().isEmpty()) {
-            fileStore.delete(String.format("%s/%s", BucketName.POSTS.getName(), post.getId()), post.getFileName());
+        if(post instanceof Post) {
+            if (((Post) post).getFileName() != null && !((Post)post).getFileName().isEmpty()) {
+                fileStore.delete(String.format("%s/%s", BucketName.POSTS.getName(), post.getId()), ((Post)post).getFileName());
+            }
+        }else{
+            Post sharedPost = (Post) getPostById(((SharedPost)post).getSharedPost().getId());
+            Set<String> newSharedUserId = sharedPost.getSharedUsersId().stream().filter(id ->  !((SharedPost)post).getSharedPost().getUser().getId().equals(id)).collect(Collectors.toSet());
+            sharedPost.setSharedUsersId(newSharedUserId);
+            postRepository.save(sharedPost);
         }
 
         for(Comment comment : post.getComments()){
@@ -95,5 +108,28 @@ public class PostService {
         }
 
         postRepository.delete(post);
+    }
+
+    public List<BasePost> sharePost(String sharedPostId, String sharingUserId) throws  PostNotFoundException, UserProfileNotFoundException {
+        Post post = (Post) postRepository.findById(sharedPostId).orElseThrow(
+                () -> new PostNotFoundException("Post with ID "+sharedPostId+" not found")
+        );
+
+        UserProfile user = userRepository.findById(sharingUserId).orElseThrow(
+                () -> new UsernameNotFoundException("User with ID "+sharingUserId+" not found")
+        );
+
+        List<BasePost> result = new ArrayList<>();
+
+        SharedPost sharedPost = new SharedPost();
+        sharedPost.setDateCreated(LocalDateTime.now());
+        sharedPost.setUser(user);
+        sharedPost.setSharedPost(post);
+        result.add(postRepository.save(sharedPost));
+
+        post.getSharedUsersId().add(sharingUserId);
+        result.add(postRepository.save(post));
+
+        return result;
     }
 }

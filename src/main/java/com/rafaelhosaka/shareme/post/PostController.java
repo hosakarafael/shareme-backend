@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
+import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.user.UserProfileService;
 import com.rafaelhosaka.shareme.utils.JsonConverter;
 import lombok.RequiredArgsConstructor;
@@ -26,21 +27,19 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    private final UserProfileService userProfileService;
 
     @Autowired
-    public PostController(PostService postService, UserProfileService userProfileService) {
+    public PostController(PostService postService) {
         this.postService = postService;
-        this.userProfileService = userProfileService;
     }
 
     @GetMapping
-    public List<Post> getAll() {
+    public List<BasePost> getAll() {
         return postService.getAll();
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable("id") String id) {
+    public ResponseEntity<BasePost> getPostById(@PathVariable("id") String id) {
         try {
             return ResponseEntity.ok().body(postService.getPostById(id));
         }catch(PostNotFoundException e){
@@ -50,7 +49,7 @@ public class PostController {
     }
 
     @PostMapping("/getPostsByUsersId")
-    public ResponseEntity<List<Post>> getPostsByUsersId(@RequestBody List<String> usersIds){
+    public ResponseEntity<List<BasePost>> getPostsByUsersId(@RequestBody List<String> usersIds){
         return ResponseEntity.ok(postService.getPostsByUsers(usersIds));
     }
 
@@ -92,6 +91,16 @@ public class PostController {
             e.printStackTrace();
         } catch (CommentNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    @PostMapping("/share/post")
+    public ResponseEntity<List<BasePost>> sharePost(@RequestPart("sharingUserId")String sharingUserId, @RequestPart("sharingPostId")String sharingPostId){
+        try {
+            return ResponseEntity.ok().body(postService.sharePost(sharingPostId, sharingUserId));
+        } catch (PostNotFoundException | UserProfileNotFoundException e) {
+            log.error("Exception : {}",e.getMessage());
+            return ResponseEntity.noContent().build();
         }
     }
 }

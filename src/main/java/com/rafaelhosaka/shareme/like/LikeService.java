@@ -4,6 +4,7 @@ import com.rafaelhosaka.shareme.comment.Comment;
 import com.rafaelhosaka.shareme.comment.CommentRepository;
 import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
+import com.rafaelhosaka.shareme.post.BasePost;
 import com.rafaelhosaka.shareme.post.Post;
 import com.rafaelhosaka.shareme.post.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class LikeService {
         this.commentRepository = commentRepository;
     }
 
-    public Post likeUnlikePost(String userId, String postId) throws PostNotFoundException {
-        Post oldPost = postRepository.findById(postId).orElseThrow(
+    public BasePost likeUnlikePost(String userId, String postId) throws PostNotFoundException {
+        BasePost oldPost = postRepository.findById(postId).orElseThrow(
                 () ->  new PostNotFoundException("Post with ID "+postId+" not found")
         );
 

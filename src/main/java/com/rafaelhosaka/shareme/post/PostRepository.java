@@ -6,8 +6,11 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
-public interface PostRepository extends MongoRepository<Post, String> {
+public interface PostRepository extends MongoRepository<BasePost, String> {
 
     @Query("{ 'user.id' : ?0}")
-    List<Post> getPostByUserId(String id);
+    List<BasePost> getPostByUserId(String id);
+
+    @Override
+    List<BasePost> findAll();
 }

@@ -2,6 +2,7 @@ package com.rafaelhosaka.shareme.comment;
 
 import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
+import com.rafaelhosaka.shareme.post.BasePost;
 import com.rafaelhosaka.shareme.post.Post;
 import com.rafaelhosaka.shareme.post.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class CommentService {
     }
 
     public Comment newComment(Comment comment, String postId) throws PostNotFoundException {
-        Post post = postRepository.findById(postId).orElseThrow(
+        BasePost post = postRepository.findById(postId).orElseThrow(
                 () -> new PostNotFoundException(("Post with ID "+postId+" not found"))
         );
 
@@ -58,7 +59,7 @@ public class CommentService {
                 () -> new CommentNotFoundException(("Comment with ID "+commentId+" not found"))
         );
 
-        Post post = postRepository.findById(postId).orElseThrow(
+        BasePost post = postRepository.findById(postId).orElseThrow(
                 () -> new PostNotFoundException(("Comment with ID "+commentId+" not found"))
         );
 
