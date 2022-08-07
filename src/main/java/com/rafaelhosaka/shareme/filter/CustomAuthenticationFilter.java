@@ -44,7 +44,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         String password = request.getParameter("password");
         log.info("Username {} login detected",username);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-        return authenticationManager.authenticate(authenticationToken);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        User user = (User)authentication.getPrincipal();
+        return authentication;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 jwtUtils.createAccessToken(
                         user.getUsername(),
                         request.getRequestURL().toString(),
-                        user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()) );
+                        user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()));
 
         String refreshToken =
                 jwtUtils.createRefreshToken(
@@ -70,10 +72,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
         response.setStatus(BAD_REQUEST.value());
-        Map<String, String> error = new HashMap<>();
         log.error("Error login : {}", failed.getMessage());
         response.setHeader("error", failed.getMessage());
         response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), error);
+        new ObjectMapper().writeValue(response.getOutputStream(), failed.getMessage());
     }
 }

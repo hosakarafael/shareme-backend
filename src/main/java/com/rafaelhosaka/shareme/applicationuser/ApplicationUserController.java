@@ -1,15 +1,13 @@
 package com.rafaelhosaka.shareme.applicationuser;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rafaelhosaka.shareme.email.EmailService;
+import com.rafaelhosaka.shareme.email.OnRegistrationCompleteEvent;
 import com.rafaelhosaka.shareme.jwt.JwtUtils;
-import com.rafaelhosaka.shareme.user.UserProfileService;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -30,10 +28,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("api/auth")
 public class ApplicationUserController {
     private final ApplicationUserService userService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public ApplicationUserController(ApplicationUserService userService) {
+    public ApplicationUserController(ApplicationUserService userService, ApplicationEventPublisher applicationEventPublisher) {
         this.userService = userService;
+        this.eventPublisher = applicationEventPublisher;
     }
 
     @GetMapping("/user/{username}")
@@ -47,10 +47,12 @@ public class ApplicationUserController {
     }
 
     @PostMapping("/user/save")
-    public ResponseEntity<ApplicationUser> saveUser(@RequestBody ApplicationUser applicationUser){
+    public ResponseEntity<ApplicationUser> saveUser(@RequestBody ApplicationUser applicationUser, HttpServletRequest request){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth/user/save").toUriString());
         try {
-            return ResponseEntity.created(uri).body(userService.saveUser(applicationUser));
+            ApplicationUser user = userService.saveUser(applicationUser);
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user,request.getLocale() , request.getContextPath()));
+            return ResponseEntity.created(uri).body(user);
         }catch(IllegalStateException e){
             return new ResponseEntity(e.getMessage(), BAD_REQUEST);
         }
@@ -86,7 +88,7 @@ public class ApplicationUserController {
                         jwtUtils.createAccessToken(
                                 user.getUsername(),
                                 request.getRequestURL().toString(),
-                                user.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
+                                user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
 
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), jwtUtils.createTokenMap(accessToken, refreshToken));

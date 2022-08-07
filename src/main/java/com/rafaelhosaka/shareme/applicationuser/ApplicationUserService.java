@@ -1,5 +1,6 @@
 package com.rafaelhosaka.shareme.applicationuser;
 
+import com.rafaelhosaka.shareme.email.EmailToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +40,15 @@ public class ApplicationUserService implements UserDetailsService {
             log.info("User {} found",username);
         }
 
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        applicationUser.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
-
-        return new User(applicationUser.getUsername(), applicationUser.getPassword(), authorities);
+        return new User(
+                applicationUser.getUsername(),
+                applicationUser.getPassword(),
+                applicationUser.isEnabled(),
+                applicationUser.isAccountNonLocked(),
+                applicationUser.isAccountNonExpired(),
+                applicationUser.isCredentialsNonExpired(),
+                applicationUser.getAuthorities()
+         );
     }
 
     public ApplicationUser saveUser(ApplicationUser user){
@@ -75,7 +81,7 @@ public class ApplicationUserService implements UserDetailsService {
         log.info("adding role {} to user {}",roleName, username);
         ApplicationUser user = userRepository.findByUsername(username);
         Role role = roleRepository.findByName(roleName);
-        user.getRoles().add(role);
+        user.addRole(role);
         userRepository.save(user);
     }
 
@@ -93,4 +99,6 @@ public class ApplicationUserService implements UserDetailsService {
         log.info("fetching all users");
         return userRepository.findAll();
     }
+
+
 }
