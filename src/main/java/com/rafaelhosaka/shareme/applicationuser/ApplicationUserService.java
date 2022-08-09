@@ -1,6 +1,7 @@
 package com.rafaelhosaka.shareme.applicationuser;
 
 import com.rafaelhosaka.shareme.email.EmailToken;
+import com.rafaelhosaka.shareme.exception.ApplicationUserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +33,11 @@ public class ApplicationUserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ApplicationUser applicationUser = userRepository.findByUsername(username);
-        if(applicationUser == null){
-            log.error("User {} not found",username);
-            throw  new UsernameNotFoundException("User not found");
-        }else{
-            log.info("User {} found",username);
-        }
+        ApplicationUser applicationUser = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("User with "+username+" not found"));
+
+        log.info("User {} found",username);
+
 
         return new User(
                 applicationUser.getUsername(),
@@ -51,7 +50,7 @@ public class ApplicationUserService implements UserDetailsService {
          );
     }
 
-    public ApplicationUser saveUser(ApplicationUser user){
+    public ApplicationUser saveUser(ApplicationUser user) throws ApplicationUserNotFoundException {
         log.info("save user {}",user.getUsername());
         if(user.getUsername().isEmpty()){
             throw new IllegalStateException("Username cannot be empty");
@@ -61,7 +60,7 @@ public class ApplicationUserService implements UserDetailsService {
             throw new IllegalStateException("Password cannot be empty");
         }
 
-        if(userRepository.findByUsername(user.getUsername()) != null){
+        if(userRepository.findByUsername(user.getUsername()).isPresent()){
             throw new IllegalStateException("This username is already registered");
         }
 
@@ -77,9 +76,11 @@ public class ApplicationUserService implements UserDetailsService {
         return roleRepository.save(role);
     }
 
-    public void addRoleToUser(String username, String roleName){
+    public void addRoleToUser(String username, String roleName) throws ApplicationUserNotFoundException {
         log.info("adding role {} to user {}",roleName, username);
-        ApplicationUser user = userRepository.findByUsername(username);
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(
+                () -> new ApplicationUserNotFoundException("User with "+username+" not found"));;
+
         Role role = roleRepository.findByName(roleName);
         user.addRole(role);
         userRepository.save(user);
@@ -87,11 +88,9 @@ public class ApplicationUserService implements UserDetailsService {
 
     public ApplicationUser getUser(String username) throws UsernameNotFoundException{
         log.info("fetching user {}",username);
-        ApplicationUser user = userRepository.findByUsername(username);
-        if(user == null){
-            log.error("{} not found",username);
-            throw new UsernameNotFoundException("{} not found");
-        }
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("User with "+username+" not found"));;
+
         return user;
     }
 

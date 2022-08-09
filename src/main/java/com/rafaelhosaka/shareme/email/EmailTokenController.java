@@ -6,13 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
+
+import javax.mail.MessagingException;
 
 @RestController
-@RequestMapping("registrationConfirm")
+@RequestMapping("api")
 @Slf4j
 public class EmailTokenController {
     private  final EmailService emailService;
@@ -22,13 +22,22 @@ public class EmailTokenController {
         this.emailService = emailService;
     }
 
-    @GetMapping
+    @GetMapping("/registrationConfirm")
     public ResponseEntity<String> confirmRegistration(@RequestParam("token") String token){
         try {
             return ResponseEntity.ok().body(emailService.confirmEmail(token));
         } catch (EmailTokenNotFoundException | EmailTokenExpiredException e) {
             log.error(e.getMessage());
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/resend/{email}")
+    public ResponseEntity<String> reSendEmail(@PathVariable("email") String email){
+        try {
+            return ResponseEntity.ok().body(emailService.resendEmail(email));
+        } catch (MessagingException | UsernameNotFoundException e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 }

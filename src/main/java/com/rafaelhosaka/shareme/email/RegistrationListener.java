@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import javax.mail.MessagingException;
 import java.util.UUID;
 
 @Component
@@ -24,15 +25,14 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     }
 
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
-        ApplicationUser user = event.getUser();
-        String token = UUID.randomUUID().toString();
-        emailService.createEmailToken(user, token);
+        try {
+            ApplicationUser user = event.getUser();
+            String recipientAddress = user.getUsername();
+            EmailToken emailToken = emailService.createEmailToken(user);
+            emailService.sendVerificationEmail(recipientAddress,emailToken.getToken());
 
-        String recipientAddress = user.getUsername();
-        String subject = "Registration Confirmation";
-        String confirmationUrl
-                = event.getAppUrl() + "/registrationConfirm?token=" + token;
-
-        emailService.sendEmail(recipientAddress,subject,"http://localhost:8080" + confirmationUrl);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 }

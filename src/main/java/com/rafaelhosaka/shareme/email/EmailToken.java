@@ -3,6 +3,7 @@ package com.rafaelhosaka.shareme.email;
 import com.rafaelhosaka.shareme.applicationuser.ApplicationUser;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,6 +21,7 @@ public class EmailToken {
     private String token;
 
     @DBRef
+    @Indexed(unique = true)
     private ApplicationUser user;
 
     private LocalDateTime expiryDate;

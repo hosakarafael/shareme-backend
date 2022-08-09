@@ -98,7 +98,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public String[] getPermitAllPaths(){
         return new String[]{
                 "/error",
-                "/registrationConfirm",
+                "/api/registrationConfirm",
+                "/api/resend/**",
                 "/api/auth/login/**",
                 "/api/auth/user/save/**",
                 "/api/auth/refresh/**",

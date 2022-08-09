@@ -35,6 +35,10 @@ public class ApplicationUser implements UserDetails {
         this.enabled = false;
     }
 
+    public String getId(){
+        return this.id;
+    }
+
     @Override
     public String getPassword() {
         return password;

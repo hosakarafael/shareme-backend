@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelhosaka.shareme.email.EmailService;
 import com.rafaelhosaka.shareme.email.OnRegistrationCompleteEvent;
+import com.rafaelhosaka.shareme.exception.ApplicationUserNotFoundException;
 import com.rafaelhosaka.shareme.jwt.JwtUtils;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class ApplicationUserController {
             ApplicationUser user = userService.saveUser(applicationUser);
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user,request.getLocale() , request.getContextPath()));
             return ResponseEntity.created(uri).body(user);
-        }catch(IllegalStateException e){
+        }catch(IllegalStateException | ApplicationUserNotFoundException e){
             return new ResponseEntity(e.getMessage(), BAD_REQUEST);
         }
     }
@@ -66,8 +67,12 @@ public class ApplicationUserController {
 
     @PostMapping("/role/addtouser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form){
-        userService.addRoleToUser(form.getUsername(), form.getRoleName());
-        return ResponseEntity.ok().build();
+        try {
+            userService.addRoleToUser(form.getUsername(), form.getRoleName());
+            return ResponseEntity.ok().build();
+        }catch (ApplicationUserNotFoundException e){
+            return new ResponseEntity(e.getMessage(), BAD_REQUEST);
+        }
     }
 
     @GetMapping("/refresh")
