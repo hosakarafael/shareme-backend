@@ -41,7 +41,7 @@ public class EmailService{
             String from = "shareme.authentication@gmail.com";
             String subject = "ShareMe Account Verification";
             String confirmationUrl
-                = "http://localhost:8080/api/registrationConfirm?token=" + token;
+                = "http://localhost:3000/verify?token=" + token;
 
             String containerStyles = "max-width:600px;" +
                                     "margin:0 auto;"+
@@ -100,7 +100,8 @@ public class EmailService{
     }
 
     public String confirmEmail(String token) throws EmailTokenNotFoundException, EmailTokenExpiredException {
-        EmailToken emailToken=  emailRepository.getEmailTokenByToken(token).orElseThrow(() -> new EmailTokenNotFoundException("EmailToken "+token+" does not exist"));
+        EmailToken emailToken=  emailRepository.getEmailTokenByToken(token).orElseThrow(
+                () -> new EmailTokenNotFoundException("Invalid URL"));
         ApplicationUser user = emailToken.getUser();
         if(emailToken.isExpired()){
             throw  new EmailTokenExpiredException("EmailToken expired");
