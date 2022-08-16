@@ -40,4 +40,13 @@ public class EmailTokenController {
             return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/recovery/{email}")
+    public ResponseEntity<String> sendPasswordRecoveryEmail(@PathVariable("email") String email){
+        try {
+            return ResponseEntity.ok().body(emailService.sendPasswordRecoveryEmail(email));
+        } catch (MessagingException | UsernameNotFoundException e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
 }

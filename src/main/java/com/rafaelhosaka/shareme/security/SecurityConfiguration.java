@@ -89,6 +89,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(PUT, "/api/friend/unfriend").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 
         //auth
+
+        http.authorizeRequests().antMatchers(PUT, "/password/username").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(GET, "/api/auth/**").hasAnyAuthority("ROLE_ADMIN");
 
         http.authorizeRequests().anyRequest().authenticated();
@@ -100,9 +102,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/error",
                 "/api/registrationConfirm",
                 "/api/resend/**",
+                "/api/recovery/**",
                 "/api/auth/login/**",
                 "/api/auth/user/save/**",
                 "/api/auth/refresh/**",
+                "/api/auth/password/token",
                 "/api/post/download/**",
                 "/api/user/save/**"
                 };

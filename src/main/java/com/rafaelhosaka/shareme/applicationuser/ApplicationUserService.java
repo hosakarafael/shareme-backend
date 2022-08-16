@@ -1,7 +1,12 @@
 package com.rafaelhosaka.shareme.applicationuser;
 
+import com.rafaelhosaka.shareme.email.EmailService;
 import com.rafaelhosaka.shareme.email.EmailToken;
+import com.rafaelhosaka.shareme.email.EmailTokenRepository;
 import com.rafaelhosaka.shareme.exception.ApplicationUserNotFoundException;
+import com.rafaelhosaka.shareme.exception.EmailTokenExpiredException;
+import com.rafaelhosaka.shareme.exception.EmailTokenNotFoundException;
+import com.rafaelhosaka.shareme.exception.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +28,14 @@ public class ApplicationUserService implements UserDetailsService {
     private final ApplicationUserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
+    private final EmailTokenRepository emailTokenRepository;
 
     @Autowired
-    public ApplicationUserService(ApplicationUserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder) {
+    public ApplicationUserService(ApplicationUserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, EmailTokenRepository emailTokenRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
+        this.emailTokenRepository = emailTokenRepository;
     }
 
     @Override
@@ -89,7 +96,7 @@ public class ApplicationUserService implements UserDetailsService {
     public ApplicationUser getUser(String username) throws UsernameNotFoundException{
         log.info("fetching user {}",username);
         ApplicationUser user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException("User with "+username+" not found"));;
+                () -> new UsernameNotFoundException("User with "+username+" not found"));
 
         return user;
     }
@@ -100,4 +107,27 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
 
+    public String changePasswordByUsername(String username,String currentPassword, String newPassword) throws UsernameNotFoundException, WrongPasswordException {
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("User with "+username+" not found")
+        );
+        if(encoder.matches(currentPassword, user.getPassword())){
+            throw new WrongPasswordException("Wrong password");
+        }
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
+        return "Password updated";
+    }
+
+    public String changePasswordByToken(String token, String newPassword) throws EmailTokenNotFoundException, EmailTokenExpiredException {
+        EmailToken emailToken=  emailTokenRepository.getEmailTokenByToken(token).orElseThrow(
+                () -> new EmailTokenNotFoundException("Token does not exist"));
+        if(emailToken.isExpired()) {
+            throw new EmailTokenExpiredException("Token expired");
+        }
+        ApplicationUser user = emailToken.getUser();
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
+        return "Password updated";
+    }
 }

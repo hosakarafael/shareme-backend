@@ -91,6 +91,61 @@ public class EmailService{
             emailSender.send(message);
     }
 
+    public void sendPasswordRecoveryEmail(
+            String to, String token) throws MessagingException {
+        String from = "shareme.authentication@gmail.com";
+        String subject = "ShareMe Password Recovery";
+        String confirmationUrl
+                = "http://localhost:3000/resetPassword?token=" + token;
+
+        String containerStyles = "max-width:600px;" +
+                "margin:0 auto;"+
+                "color:black;";
+
+        String btnStyles = "display:inline-block;"+
+                "border-radius: 30px;" +
+                "padding: 1rem;" +
+                "font-weight: 700;" +
+                "border: 0;" +
+                "background: #02690b;"+
+                "color: white;"+
+                "text-decoration:none;"+
+                "padding: 20px;";
+
+
+        String body =
+                "<div style=\"margin:0;padding:0;\">"+
+                        "<div style=\""+containerStyles+"\">" +
+                        "<div style=\"background:#f1f2f2;padding:20px;\" align=\"center\">"+
+                        "<img style=\"width:200px;height:75px;\" src=\"cid:logo\">"+
+                        "</div>"+
+                        "<div style=\"margin-bottom:24px\" align=\"center\">"+
+                        "<p>We received a request to reset your password for your ShareMe account "+to+"</p>"+
+                        "<p>Please click on the button below to set a new password.</p>"+
+                        "<div style=\"margin-top:24px\" align=\"center\">"+
+                        "<a href=\""+confirmationUrl+"\" style=\"" + btnStyles + "\">Set new password</a>" +
+                        "</div>"+
+                        "</div>"+
+                        "<hr style=\"border-top-width:1px;border-top-color:#c5c5c5;margin:8px 0 48px;border-style:solid none none;\">"+
+                        "<div align=\"center\">"+
+                        "Rafael Hideki Hosaka © 2022 ShareMe"+
+                        "</div>"+
+                        "</div>"+
+                        "<span style=\"opacity:0\">"+LocalDateTime.now()+"</span>"+
+                        "</div>";
+
+
+
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED,"UTF-8");
+        helper.setText(body,true);
+        helper.addInline("logo", new ClassPathResource("static/img/logo-full.png"));
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setFrom(from);
+        emailSender.send(message);
+    }
+
     public EmailToken createEmailToken(ApplicationUser user) {
         String token = UUID.randomUUID().toString();
         EmailToken emailToken = new EmailToken();
@@ -128,5 +183,24 @@ public class EmailService{
         EmailToken newEmailToken = emailRepository.save(createEmailToken(user));
         sendVerificationEmail(email, newEmailToken.getToken());
         return "Resent email";
+    }
+
+    public String sendPasswordRecoveryEmail(String email) throws MessagingException {
+        ApplicationUser user = userRepository.findByUsername(email).orElseThrow(
+                () -> new UsernameNotFoundException("User with "+email+" not found"));;
+
+        Optional<EmailToken> emailToken = emailRepository.getEmailTokenByUserId(user.getId());
+        if(emailToken.isPresent()){
+            if(!emailToken.get().isExpired()){
+                sendPasswordRecoveryEmail(email,emailToken.get().getToken());
+                return "Email for resetting password sent";
+            }else{
+                emailRepository.delete(emailToken.get());
+            }
+        }
+
+        EmailToken newEmailToken = emailRepository.save(createEmailToken(user));
+        sendPasswordRecoveryEmail(email, newEmailToken.getToken());
+        return "Email for resetting password sent";
     }
 }

@@ -5,11 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelhosaka.shareme.email.EmailService;
 import com.rafaelhosaka.shareme.email.OnRegistrationCompleteEvent;
 import com.rafaelhosaka.shareme.exception.ApplicationUserNotFoundException;
+import com.rafaelhosaka.shareme.exception.EmailTokenExpiredException;
+import com.rafaelhosaka.shareme.exception.EmailTokenNotFoundException;
+import com.rafaelhosaka.shareme.exception.WrongPasswordException;
 import com.rafaelhosaka.shareme.jwt.JwtUtils;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -108,6 +112,24 @@ public class ApplicationUserController {
             }
         }else{
             throw new RuntimeException("Refresh token is missing");
+        }
+    }
+
+    @PutMapping("/password/username")
+    public ResponseEntity<String> changePassword(@RequestPart("username") String username,@RequestPart("currentPassword")String currentPassword, @RequestPart("newPassword") String newPassword){
+        try {
+            return ResponseEntity.ok().body(userService.changePasswordByUsername(username, currentPassword, newPassword));
+        }catch (UsernameNotFoundException | WrongPasswordException e){
+            return new ResponseEntity(e.getMessage(),BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/password/token")
+    public ResponseEntity<String> changePasswordByToken(@RequestPart("token") String token, @RequestPart("newPassword") String newPassword){
+        try {
+            return ResponseEntity.ok().body(userService.changePasswordByToken(token, newPassword));
+        }catch (EmailTokenNotFoundException| EmailTokenExpiredException e){
+            return new ResponseEntity(e.getMessage(),BAD_REQUEST);
         }
     }
 }
