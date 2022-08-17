@@ -2,22 +2,18 @@ package com.rafaelhosaka.shareme.email;
 
 import com.rafaelhosaka.shareme.applicationuser.ApplicationUser;
 import com.rafaelhosaka.shareme.applicationuser.ApplicationUserRepository;
-import com.rafaelhosaka.shareme.applicationuser.ApplicationUserService;
 import com.rafaelhosaka.shareme.exception.EmailTokenExpiredException;
 import com.rafaelhosaka.shareme.exception.EmailTokenNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +25,9 @@ public class EmailService{
     private EmailTokenRepository emailRepository;
     private ApplicationUserRepository userRepository;
 
+    private final String FROM = "shareme.authentication@gmail.com";
+    private final String URL = "http://localhost:3000";
+
     @Autowired
     public EmailService(JavaMailSender emailSender, EmailTokenRepository emailRepository, ApplicationUserRepository userRepository){
         this.emailRepository = emailRepository;
@@ -38,10 +37,9 @@ public class EmailService{
 
     public void sendVerificationEmail(
             String to, String token) throws MessagingException {
-            String from = "shareme.authentication@gmail.com";
             String subject = "ShareMe Account Verification";
             String confirmationUrl
-                = "http://localhost:3000/verify?token=" + token;
+                = URL + "/verify?token=" + token;
 
             String containerStyles = "max-width:600px;" +
                                     "margin:0 auto;"+
@@ -79,24 +77,14 @@ public class EmailService{
                         "<span style=\"opacity:0\">"+LocalDateTime.now()+"</span>"+
                     "</div>";
 
-
-
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED,"UTF-8");
-            helper.setText(body,true);
-            helper.addInline("logo", new ClassPathResource("static/img/logo-full.png"));
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setFrom(from);
-            emailSender.send(message);
+        sendEmail(body, to , subject);
     }
 
     public void sendPasswordRecoveryEmail(
             String to, String token) throws MessagingException {
-        String from = "shareme.authentication@gmail.com";
         String subject = "ShareMe Password Recovery";
-        String confirmationUrl
-                = "http://localhost:3000/resetPassword?token=" + token;
+        String resetPasswordUrl
+                = URL + "/resetPassword?token=" + token;
 
         String containerStyles = "max-width:600px;" +
                 "margin:0 auto;"+
@@ -123,7 +111,7 @@ public class EmailService{
                         "<p>We received a request to reset your password for your ShareMe account "+to+"</p>"+
                         "<p>Please click on the button below to set a new password.</p>"+
                         "<div style=\"margin-top:24px\" align=\"center\">"+
-                        "<a href=\""+confirmationUrl+"\" style=\"" + btnStyles + "\">Set new password</a>" +
+                        "<a href=\""+resetPasswordUrl+"\" style=\"" + btnStyles + "\">Set new password</a>" +
                         "</div>"+
                         "</div>"+
                         "<hr style=\"border-top-width:1px;border-top-color:#c5c5c5;margin:8px 0 48px;border-style:solid none none;\">"+
@@ -134,15 +122,57 @@ public class EmailService{
                         "<span style=\"opacity:0\">"+LocalDateTime.now()+"</span>"+
                         "</div>";
 
+        sendEmail(body, to , subject);
+    }
+
+    public void sendPasswordChangedNotification(
+            String to) throws MessagingException {
+        String subject = "You changed your password";
+
+        String containerStyles = "max-width:600px;" +
+                "margin:0 auto;"+
+                "color:black;";
+
+        String btnStyles = "display:inline-block;"+
+                "border-radius: 30px;" +
+                "padding: 1rem;" +
+                "font-weight: 700;" +
+                "border: 0;" +
+                "background: #02690b;"+
+                "color: white;"+
+                "text-decoration:none;"+
+                "padding: 20px;";
 
 
+        String body =
+                "<div style=\"margin:0;padding:0;\">"+
+                        "<div style=\""+containerStyles+"\">" +
+                        "<div style=\"background:#f1f2f2;padding:20px;\" align=\"center\">"+
+                        "<img style=\"width:200px;height:75px;\" src=\"cid:logo\">"+
+                        "</div>"+
+                        "<div style=\"margin-bottom:24px\" align=\"center\">"+
+                        "<h1 style=\"margin:24px\">Your password changed</h1>"+
+                        "<p>If you didn’t change your password, please contact us right away</p>"+
+                        "</div>"+
+                        "<hr style=\"border-top-width:1px;border-top-color:#c5c5c5;margin:8px 0 48px;border-style:solid none none;\">"+
+                        "<div align=\"center\">"+
+                        "Rafael Hideki Hosaka © 2022 ShareMe"+
+                        "</div>"+
+                        "</div>"+
+                        "<span style=\"opacity:0\">"+LocalDateTime.now()+"</span>"+
+                        "</div>";
+
+        sendEmail(body, to , subject);
+    }
+
+    private void sendEmail(String body, String to, String subject) throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED,"UTF-8");
         helper.setText(body,true);
-        helper.addInline("logo", new ClassPathResource("static/img/logo-full.png"));
+        helper.addInline("logo", new ClassPathResource("image/logo-full.png"));
         helper.setTo(to);
         helper.setSubject(subject);
-        helper.setFrom(from);
+        helper.setFrom(FROM);
         emailSender.send(message);
     }
 

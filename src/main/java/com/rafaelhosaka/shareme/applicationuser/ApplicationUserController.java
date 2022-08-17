@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -119,7 +120,7 @@ public class ApplicationUserController {
     public ResponseEntity<String> changePassword(@RequestPart("username") String username,@RequestPart("currentPassword")String currentPassword, @RequestPart("newPassword") String newPassword){
         try {
             return ResponseEntity.ok().body(userService.changePasswordByUsername(username, currentPassword, newPassword));
-        }catch (UsernameNotFoundException | WrongPasswordException e){
+        }catch (UsernameNotFoundException | WrongPasswordException | MessagingException e){
             return new ResponseEntity(e.getMessage(),BAD_REQUEST);
         }
     }
@@ -128,7 +129,7 @@ public class ApplicationUserController {
     public ResponseEntity<String> changePasswordByToken(@RequestPart("token") String token, @RequestPart("newPassword") String newPassword){
         try {
             return ResponseEntity.ok().body(userService.changePasswordByToken(token, newPassword));
-        }catch (EmailTokenNotFoundException| EmailTokenExpiredException e){
+        }catch (EmailTokenNotFoundException| EmailTokenExpiredException | MessagingException e){
             return new ResponseEntity(e.getMessage(),BAD_REQUEST);
         }
     }

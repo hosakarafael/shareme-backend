@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,13 +30,15 @@ public class ApplicationUserService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final EmailTokenRepository emailTokenRepository;
+    private final EmailService emailService;
 
     @Autowired
-    public ApplicationUserService(ApplicationUserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, EmailTokenRepository emailTokenRepository) {
+    public ApplicationUserService(ApplicationUserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, EmailTokenRepository emailTokenRepository, EmailService emailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
         this.emailTokenRepository = emailTokenRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -107,7 +110,7 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
 
-    public String changePasswordByUsername(String username,String currentPassword, String newPassword) throws UsernameNotFoundException, WrongPasswordException {
+    public String changePasswordByUsername(String username,String currentPassword, String newPassword) throws UsernameNotFoundException, WrongPasswordException, MessagingException {
         ApplicationUser user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("User with "+username+" not found")
         );
@@ -116,10 +119,11 @@ public class ApplicationUserService implements UserDetailsService {
         }
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
+        emailService.sendPasswordChangedNotification(user.getUsername());
         return "Password updated";
     }
 
-    public String changePasswordByToken(String token, String newPassword) throws EmailTokenNotFoundException, EmailTokenExpiredException {
+    public String changePasswordByToken(String token, String newPassword) throws EmailTokenNotFoundException, EmailTokenExpiredException, MessagingException {
         EmailToken emailToken=  emailTokenRepository.getEmailTokenByToken(token).orElseThrow(
                 () -> new EmailTokenNotFoundException("Token does not exist"));
         if(emailToken.isExpired()) {
@@ -128,6 +132,7 @@ public class ApplicationUserService implements UserDetailsService {
         ApplicationUser user = emailToken.getUser();
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
+        emailService.sendPasswordChangedNotification(user.getUsername());
         return "Password updated";
     }
 }
