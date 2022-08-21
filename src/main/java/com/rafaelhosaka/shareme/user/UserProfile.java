@@ -44,4 +44,6 @@ public class UserProfile {
     private List<String> friends = new ArrayList<>();
 
     private ThemePreference themePreference;
+
+    private boolean online;
 }
