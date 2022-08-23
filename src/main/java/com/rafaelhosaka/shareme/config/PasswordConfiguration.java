@@ -1,4 +1,4 @@
-package com.rafaelhosaka.shareme.security;
+package com.rafaelhosaka.shareme.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

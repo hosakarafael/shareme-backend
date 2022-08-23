@@ -155,4 +155,12 @@ public class UserProfileService {
 
         return users;
     }
+
+    public void changeStatusById(String id, boolean online) throws UserProfileNotFoundException {
+        UserProfile user = userRepository.findById(id).orElseThrow(
+                () -> new UserProfileNotFoundException("User with "+id+" not found")
+        );
+        user.setOnline(online);
+        userRepository.save(user);
+    }
 }

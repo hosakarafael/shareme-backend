@@ -1,4 +1,4 @@
-package com.rafaelhosaka.shareme.security;
+package com.rafaelhosaka.shareme.config;
 
 import com.rafaelhosaka.shareme.filter.CustomAuthenticationFilter;
 import com.rafaelhosaka.shareme.filter.CustomAuthorizationFilter;
@@ -42,6 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 cors.setAllowedOrigins(List.of("http://localhost:3000"));
                 cors.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
                 cors.setAllowedHeaders(List.of("*"));
+                cors.setAllowCredentials(true);
                 return cors;
         });
 
@@ -112,7 +113,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/api/auth/refresh/**",
                 "/api/auth/password/token",
                 "/api/post/download/**",
-                "/api/user/save/**"
+                "/api/user/save/**",
+                "/ws/**"
                 };
     }
 }
