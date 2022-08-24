@@ -22,9 +22,9 @@ public class ChatController {
     private UserProfileService userProfileService;
 
     @MessageMapping("/change-status")
-    @SendTo("/chat/status")
-    public ChatStatus receiveMessage(@Payload ChatStatus newStatus){
+    public ChatStatus changeStatus(@Payload ChatStatus newStatus){
         try {
+            simpMessagingTemplate.convertAndSendToUser(newStatus.getId(),"/status",newStatus);
             userProfileService.changeStatusById(newStatus.getId(), newStatus.isOnline());
         } catch (UserProfileNotFoundException e) {
             e.printStackTrace();
@@ -33,7 +33,7 @@ public class ChatController {
     }
 
     @MessageMapping("/message")
-    public Message recMessage(@Payload Message message){
+    public Message receiveMessage(@Payload Message message){
         simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getId(),"/private",message);
         return message;
     }
