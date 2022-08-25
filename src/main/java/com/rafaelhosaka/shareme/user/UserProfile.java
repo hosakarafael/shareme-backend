@@ -45,5 +45,7 @@ public class UserProfile {
 
     private ThemePreference themePreference;
 
+    private LanguagePreference languagePreference;
+
     private boolean online;
 }
