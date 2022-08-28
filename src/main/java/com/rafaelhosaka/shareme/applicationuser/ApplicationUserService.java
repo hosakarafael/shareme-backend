@@ -114,7 +114,7 @@ public class ApplicationUserService implements UserDetailsService {
         ApplicationUser user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("User with "+username+" not found")
         );
-        if(encoder.matches(currentPassword, user.getPassword())){
+        if(!encoder.matches(currentPassword, user.getPassword())){
             throw new WrongPasswordException("Wrong password");
         }
         user.setPassword(encoder.encode(newPassword));
