@@ -4,10 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelhosaka.shareme.email.EmailService;
 import com.rafaelhosaka.shareme.email.OnRegistrationCompleteEvent;
-import com.rafaelhosaka.shareme.exception.ApplicationUserNotFoundException;
-import com.rafaelhosaka.shareme.exception.EmailTokenExpiredException;
-import com.rafaelhosaka.shareme.exception.EmailTokenNotFoundException;
-import com.rafaelhosaka.shareme.exception.WrongPasswordException;
+import com.rafaelhosaka.shareme.exception.*;
 import com.rafaelhosaka.shareme.jwt.JwtUtils;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +31,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("api/auth")
 public class ApplicationUserController {
     private final ApplicationUserService userService;
-    private final ApplicationEventPublisher eventPublisher;
+
 
     @Autowired
-    public ApplicationUserController(ApplicationUserService userService, ApplicationEventPublisher applicationEventPublisher) {
+    public ApplicationUserController(ApplicationUserService userService) {
         this.userService = userService;
-        this.eventPublisher = applicationEventPublisher;
     }
 
     @GetMapping("/user/{username}")
@@ -53,11 +49,10 @@ public class ApplicationUserController {
     }
 
     @PostMapping("/user/save")
-    public ResponseEntity<ApplicationUser> saveUser(@RequestBody ApplicationUser applicationUser, HttpServletRequest request){
+    public ResponseEntity<ApplicationUser> saveUser(@RequestBody ApplicationUser applicationUser){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth/user/save").toUriString());
         try {
             ApplicationUser user = userService.saveUser(applicationUser);
-            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user,request.getLocale() , request.getContextPath()));
             return ResponseEntity.created(uri).body(user);
         }catch(IllegalStateException | ApplicationUserNotFoundException e){
             return new ResponseEntity(e.getMessage(), BAD_REQUEST);
@@ -120,7 +115,7 @@ public class ApplicationUserController {
     public ResponseEntity<String> changePassword(@RequestPart("username") String username,@RequestPart("currentPassword")String currentPassword, @RequestPart("newPassword") String newPassword){
         try {
             return ResponseEntity.ok().body(userService.changePasswordByUsername(username, currentPassword, newPassword));
-        }catch (UsernameNotFoundException | WrongPasswordException | MessagingException e){
+        }catch (UsernameNotFoundException | WrongPasswordException | MessagingException | UserProfileNotFoundException e){
             return new ResponseEntity(e.getMessage(),BAD_REQUEST);
         }
     }
@@ -129,7 +124,7 @@ public class ApplicationUserController {
     public ResponseEntity<String> changePasswordByToken(@RequestPart("token") String token, @RequestPart("newPassword") String newPassword){
         try {
             return ResponseEntity.ok().body(userService.changePasswordByToken(token, newPassword));
-        }catch (EmailTokenNotFoundException| EmailTokenExpiredException | MessagingException e){
+        }catch (EmailTokenNotFoundException | EmailTokenExpiredException | MessagingException | UserProfileNotFoundException e){
             return new ResponseEntity(e.getMessage(),BAD_REQUEST);
         }
     }

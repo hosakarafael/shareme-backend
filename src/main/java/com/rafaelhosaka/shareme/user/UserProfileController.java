@@ -1,8 +1,10 @@
 package com.rafaelhosaka.shareme.user;
 
+import com.rafaelhosaka.shareme.email.OnRegistrationCompleteEvent;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +22,12 @@ import java.util.List;
 public class UserProfileController {
 
     private UserProfileService userService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public UserProfileController(UserProfileService userService) {
+    public UserProfileController(UserProfileService userService, ApplicationEventPublisher applicationEventPublisher) {
         this.userService = userService;
+        this.eventPublisher = applicationEventPublisher;
     }
 
     @GetMapping("/all")
@@ -62,7 +66,9 @@ public class UserProfileController {
     public ResponseEntity<UserProfile> saveUserProfile(@RequestBody UserProfile userProfile){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
         try{
-            return ResponseEntity.created(uri).body(userService.save(userProfile));
+            UserProfile user = userService.save(userProfile);
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user,userProfile.getLanguagePreference()));
+            return ResponseEntity.created(uri).body(user);
         }catch(IllegalStateException e){
             return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }

@@ -3,10 +3,9 @@ package com.rafaelhosaka.shareme.applicationuser;
 import com.rafaelhosaka.shareme.email.EmailService;
 import com.rafaelhosaka.shareme.email.EmailToken;
 import com.rafaelhosaka.shareme.email.EmailTokenRepository;
-import com.rafaelhosaka.shareme.exception.ApplicationUserNotFoundException;
-import com.rafaelhosaka.shareme.exception.EmailTokenExpiredException;
-import com.rafaelhosaka.shareme.exception.EmailTokenNotFoundException;
-import com.rafaelhosaka.shareme.exception.WrongPasswordException;
+import com.rafaelhosaka.shareme.exception.*;
+import com.rafaelhosaka.shareme.user.UserProfile;
+import com.rafaelhosaka.shareme.user.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +30,16 @@ public class ApplicationUserService implements UserDetailsService {
     private final PasswordEncoder encoder;
     private final EmailTokenRepository emailTokenRepository;
     private final EmailService emailService;
+    private final UserProfileRepository userProfileRepository;
 
     @Autowired
-    public ApplicationUserService(ApplicationUserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, EmailTokenRepository emailTokenRepository, EmailService emailService) {
+    public ApplicationUserService(ApplicationUserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, EmailTokenRepository emailTokenRepository, EmailService emailService, UserProfileRepository userProfileRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
         this.emailTokenRepository = emailTokenRepository;
         this.emailService = emailService;
+        this.userProfileRepository = userProfileRepository;
     }
 
     @Override
@@ -110,7 +111,7 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
 
-    public String changePasswordByUsername(String username,String currentPassword, String newPassword) throws UsernameNotFoundException, WrongPasswordException, MessagingException {
+    public String changePasswordByUsername(String username,String currentPassword, String newPassword) throws UsernameNotFoundException, WrongPasswordException, MessagingException, UserProfileNotFoundException {
         ApplicationUser user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("User with "+username+" not found")
         );
@@ -119,11 +120,14 @@ public class ApplicationUserService implements UserDetailsService {
         }
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
-        emailService.sendPasswordChangedNotification(user.getUsername());
+        UserProfile userProfile = userProfileRepository.findUserProfileByEmail(username).orElseThrow(
+                () -> new UserProfileNotFoundException("User Profile with email "+username+" not found")
+        );
+        emailService.sendPasswordChangedNotification(user.getUsername(), userProfile.getLanguagePreference().getShortName());
         return "Password updated";
     }
 
-    public String changePasswordByToken(String token, String newPassword) throws EmailTokenNotFoundException, EmailTokenExpiredException, MessagingException {
+    public String changePasswordByToken(String token, String newPassword) throws EmailTokenNotFoundException, EmailTokenExpiredException, MessagingException, UserProfileNotFoundException {
         EmailToken emailToken=  emailTokenRepository.getEmailTokenByToken(token).orElseThrow(
                 () -> new EmailTokenNotFoundException("Token does not exist"));
         if(emailToken.isExpired()) {
@@ -132,7 +136,10 @@ public class ApplicationUserService implements UserDetailsService {
         ApplicationUser user = emailToken.getUser();
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
-        emailService.sendPasswordChangedNotification(user.getUsername());
+        UserProfile userProfile = userProfileRepository.findUserProfileByEmail(user.getUsername()).orElseThrow(
+                () -> new UserProfileNotFoundException("User Profile with email "+user.getUsername()+" not found")
+        );
+        emailService.sendPasswordChangedNotification(user.getUsername(), userProfile.getLanguagePreference().getShortName());
         return "Password updated";
     }
 }

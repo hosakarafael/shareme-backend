@@ -2,6 +2,7 @@ package com.rafaelhosaka.shareme.email;
 
 import com.rafaelhosaka.shareme.exception.EmailTokenExpiredException;
 import com.rafaelhosaka.shareme.exception.EmailTokenNotFoundException;
+import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,16 +37,16 @@ public class EmailTokenController {
     public ResponseEntity<String> reSendEmail(@PathVariable("email") String email){
         try {
             return ResponseEntity.ok().body(emailService.resendEmail(email));
-        } catch (MessagingException | UsernameNotFoundException e) {
+        } catch (MessagingException | UsernameNotFoundException | UserProfileNotFoundException e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/recovery/{email}")
-    public ResponseEntity<String> sendPasswordRecoveryEmail(@PathVariable("email") String email){
+    public ResponseEntity<String> passwordRecoveryEmail(@PathVariable("email") String email){
         try {
-            return ResponseEntity.ok().body(emailService.sendPasswordRecoveryEmail(email));
-        } catch (MessagingException | UsernameNotFoundException e) {
+            return ResponseEntity.ok().body(emailService.passwordRecoveryEmail(email));
+        } catch (MessagingException | UsernameNotFoundException | UserProfileNotFoundException e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
