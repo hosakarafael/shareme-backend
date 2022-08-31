@@ -4,6 +4,7 @@ import com.rafaelhosaka.shareme.applicationuser.ApplicationUser;
 import com.rafaelhosaka.shareme.applicationuser.ApplicationUserRepository;
 import com.rafaelhosaka.shareme.exception.EmailTokenExpiredException;
 import com.rafaelhosaka.shareme.exception.EmailTokenNotFoundException;
+import com.rafaelhosaka.shareme.exception.UserAlreadyEnabledException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.user.LanguagePreference;
 import com.rafaelhosaka.shareme.user.UserProfile;
@@ -96,9 +97,12 @@ public class EmailService{
         return "Your email has been verified";
     }
 
-    public String resendEmail(String email) throws MessagingException, UsernameNotFoundException, UserProfileNotFoundException {
+    public String resendEmail(String email) throws MessagingException, UsernameNotFoundException, UserProfileNotFoundException, UserAlreadyEnabledException {
         ApplicationUser user = userRepository.findByUsername(email).orElseThrow(
-                () -> new UsernameNotFoundException("User with "+email+" not found"));;
+                () -> new UsernameNotFoundException("User with "+email+" not found"));
+        if(user.isEnabled()){
+            throw new UserAlreadyEnabledException("This user account is already activated");
+        }
 
         Optional<EmailToken> emailToken = emailRepository.getEmailTokenByUserId(user.getId());
 

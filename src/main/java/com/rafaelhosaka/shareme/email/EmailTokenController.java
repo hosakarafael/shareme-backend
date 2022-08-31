@@ -2,6 +2,7 @@ package com.rafaelhosaka.shareme.email;
 
 import com.rafaelhosaka.shareme.exception.EmailTokenExpiredException;
 import com.rafaelhosaka.shareme.exception.EmailTokenNotFoundException;
+import com.rafaelhosaka.shareme.exception.UserAlreadyEnabledException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class EmailTokenController {
     public ResponseEntity<String> reSendEmail(@PathVariable("email") String email){
         try {
             return ResponseEntity.ok().body(emailService.resendEmail(email));
-        } catch (MessagingException | UsernameNotFoundException | UserProfileNotFoundException e) {
+        } catch (MessagingException | UsernameNotFoundException | UserProfileNotFoundException | UserAlreadyEnabledException e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
