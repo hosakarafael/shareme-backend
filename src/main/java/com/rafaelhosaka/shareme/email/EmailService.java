@@ -44,7 +44,7 @@ public class EmailService{
     public void sendVerificationEmail(
             String to, String token, String language) throws MessagingException {
             String confirmationUrl
-                = URL + "/verify?token=" + token;
+                = URL + "/verify?token=" + token + "&lng=" + language;
 
             List<String> emailBuilt = new EmailBuilder(language).verificationEmail(confirmationUrl);
 
@@ -54,7 +54,7 @@ public class EmailService{
     public void sendPasswordRecoveryEmail(
             String to, String token, String language) throws MessagingException {
         String resetPasswordUrl
-                = URL + "/resetPassword?token=" + token;
+                = URL + "/resetPassword?token=" + token + "&lng=" + language;
         List<String> emailBuilt =  new EmailBuilder(language).passwordRecoveryEmail(resetPasswordUrl, to);
         sendEmail(emailBuilt.get(1), to , emailBuilt.get(0));
     }
