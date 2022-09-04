@@ -1,6 +1,7 @@
 package com.rafaelhosaka.shareme.friend;
 
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
+import com.rafaelhosaka.shareme.notification.NotificationService;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,14 @@ import java.util.List;
 @Service
 public class FriendService {
     private FriendRequestRepository friendRequestRepository;
-
     private UserProfileService userProfileService;
+    private NotificationService notificationService;
 
     @Autowired
-    public FriendService(FriendRequestRepository friendRequestRepository, UserProfileService userProfileService) {
+    public FriendService(FriendRequestRepository friendRequestRepository, UserProfileService userProfileService, NotificationService notificationService) {
         this.friendRequestRepository = friendRequestRepository;
         this.userProfileService = userProfileService;
+        this.notificationService = notificationService;
     }
 
     public List<FriendRequest> getRequestedUsers(String requestingUserId){
@@ -29,7 +31,8 @@ public class FriendService {
         return friendRequestRepository.getPendingFriendRequest(targetUserId);
     }
 
-    public FriendRequest createFriendRequest(FriendRequest friendRequest){
+    public FriendRequest createFriendRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
+        notificationService.createFriendRequestNotification(friendRequest);
         return friendRequestRepository.save(friendRequest);
     }
 

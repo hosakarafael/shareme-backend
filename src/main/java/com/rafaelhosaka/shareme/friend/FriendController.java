@@ -4,6 +4,7 @@ import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.utils.JsonConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,12 @@ public class FriendController {
     @PostMapping("/createRequest")
     public ResponseEntity<FriendRequest> createFriendRequest(@RequestBody FriendRequest friendRequest){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/friend/createRequest").toUriString());
-        return ResponseEntity.created(uri).body(friendService.createFriendRequest(friendRequest));
+        try {
+            return ResponseEntity.created(uri).body(friendService.createFriendRequest(friendRequest));
+        } catch (UserProfileNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
     
     @DeleteMapping("/deleteRequest")
