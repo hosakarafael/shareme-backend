@@ -34,7 +34,7 @@ public class FriendController {
     }
 
     @PostMapping("/createRequest")
-    public ResponseEntity<FriendRequest> createFriendRequest(@RequestBody FriendRequest friendRequest){
+    public ResponseEntity<List<Object>> createFriendRequest(@RequestBody FriendRequest friendRequest){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/friend/createRequest").toUriString());
         try {
             return ResponseEntity.created(uri).body(friendService.createFriendRequest(friendRequest));

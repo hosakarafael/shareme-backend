@@ -44,4 +44,11 @@ public class NotificationService {
     public int unreadCount(String id) {
         return notificationRepository.getUnreadByUserId(id).size();
     }
+
+    public Notification getNotificationById(String notificationId) throws NotificationNotFoundException{
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+                () -> new NotificationNotFoundException("Notification with id "+notificationId+" not found")
+        );
+        return notification;
+    }
 }

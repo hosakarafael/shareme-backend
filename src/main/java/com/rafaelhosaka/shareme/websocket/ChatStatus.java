@@ -1,4 +1,4 @@
-package com.rafaelhosaka.shareme.chat;
+package com.rafaelhosaka.shareme.websocket;
 
 import lombok.*;
 

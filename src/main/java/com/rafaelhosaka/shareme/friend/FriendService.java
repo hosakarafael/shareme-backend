@@ -1,6 +1,8 @@
 package com.rafaelhosaka.shareme.friend;
 
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
+import com.rafaelhosaka.shareme.notification.FriendRequestNotification;
+import com.rafaelhosaka.shareme.notification.Notification;
 import com.rafaelhosaka.shareme.notification.NotificationService;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileService;
@@ -31,9 +33,13 @@ public class FriendService {
         return friendRequestRepository.getPendingFriendRequest(targetUserId);
     }
 
-    public FriendRequest createFriendRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
-        notificationService.createFriendRequestNotification(friendRequest);
-        return friendRequestRepository.save(friendRequest);
+    public List<Object> createFriendRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
+        List<Object> returnData = new ArrayList<>();
+        Notification notification = notificationService.createFriendRequestNotification(friendRequest);
+        FriendRequest request = friendRequestRepository.save(friendRequest);
+        returnData.add(request);
+        returnData.add(notification);
+        return returnData;
     }
 
     public void deleteFriendRequest(FriendRequest friendRequest) {
