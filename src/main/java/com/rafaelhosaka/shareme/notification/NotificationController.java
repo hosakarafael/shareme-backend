@@ -23,6 +23,11 @@ public class NotificationController {
         return ResponseEntity.ok().body(notificationService.getNotificationsByUserId(id));
     }
 
+    @GetMapping("/{id}/unreadCount")
+    public int unreadCount(@PathVariable("id")String id){
+        return notificationService.unreadCount(id);
+    }
+
     @PutMapping("/markAsRead")
     public ResponseEntity<Notification> markAsRead(@RequestBody Object notificationId){
         try {

@@ -40,4 +40,8 @@ public class NotificationService {
         notification.setRead(true);
         return notificationRepository.save(notification);
     }
+
+    public int unreadCount(String id) {
+        return notificationRepository.getUnreadByUserId(id).size();
+    }
 }

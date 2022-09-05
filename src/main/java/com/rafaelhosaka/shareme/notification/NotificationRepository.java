@@ -9,4 +9,7 @@ public interface NotificationRepository extends MongoRepository<Notification, St
 
     @Query("{ 'ownerUserId' : ?0}")
     List<Notification> getByUserId(String id);
+
+    @Query("{ 'ownerUserId' : ?0, 'read' : false}")
+    List<Notification> getUnreadByUserId(String id);
 }
