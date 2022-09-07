@@ -95,6 +95,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //notification
         http.authorizeRequests().antMatchers(GET, "/api/notification/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(PUT, "/api/notification/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(DELETE, "/api/notification/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 
         //auth
 

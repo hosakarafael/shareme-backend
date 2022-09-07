@@ -51,4 +51,8 @@ public class NotificationService {
         );
         return notification;
     }
+
+    public void deleteNotification(String notificationId) throws NotificationNotFoundException {
+        notificationRepository.deleteById(notificationId);
+    }
 }

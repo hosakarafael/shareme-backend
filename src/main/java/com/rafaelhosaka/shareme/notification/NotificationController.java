@@ -43,4 +43,13 @@ public class NotificationController {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @DeleteMapping
+    public void deleteNotification(@RequestBody String notificationId){
+        try {
+            notificationService.deleteNotification(notificationId);
+        } catch (NotificationNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
