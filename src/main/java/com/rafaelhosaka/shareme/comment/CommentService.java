@@ -81,4 +81,8 @@ public class CommentService {
         }
         commentRepository.delete(comment);
     }
+
+    public Comment updateComment(Comment comment) {
+        return commentRepository.save(comment);
+    }
 }

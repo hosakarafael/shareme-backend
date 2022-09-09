@@ -43,6 +43,11 @@ public class CommentController {
         }
     }
 
+    @PutMapping("/update")
+    private ResponseEntity<Comment> updateComment(@RequestBody Comment comment){
+        return ResponseEntity.ok().body(commentService.updateComment(comment ));
+    }
+
 
     @DeleteMapping("/delete")
     public void deleteComment(@RequestPart("commentId") String commentId, @RequestPart("postId")String postId) {
