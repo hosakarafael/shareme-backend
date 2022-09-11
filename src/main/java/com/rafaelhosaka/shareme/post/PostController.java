@@ -103,4 +103,9 @@ public class PostController {
             return ResponseEntity.noContent().build();
         }
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<Post> updatePost(@RequestBody Post post){
+        return ResponseEntity.ok().body(postService.updatePost(post));
+    }
 }
