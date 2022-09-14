@@ -24,7 +24,7 @@ public class NotificationService {
     public Notification createFriendRequestNotification(FriendRequest friendRequest) throws UserProfileNotFoundException {
         UserProfile requestingUser = userProfileService.getUserProfileById(friendRequest.getRequestingUserId());
         FriendRequestNotification notification = new FriendRequestNotification();
-        notification.setFriendRequesting(new NotificationUserData(requestingUser.getId(), requestingUser.getFirstName(), requestingUser.getLastName()));
+        notification.setFriendRequesting(requestingUser);
         notification.setOwnerUserId(friendRequest.getTargetUserId());
         return notificationRepository.save(notification);
     }

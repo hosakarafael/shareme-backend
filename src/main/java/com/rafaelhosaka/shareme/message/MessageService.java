@@ -1,5 +1,7 @@
 package com.rafaelhosaka.shareme.message;
 
+import com.rafaelhosaka.shareme.chat.Chat;
+import com.rafaelhosaka.shareme.chat.ChatRepository;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileService;
@@ -15,11 +17,13 @@ import java.util.List;
 public class MessageService {
     private final MessageRepository messageRepository;
     private final UserProfileService userService;
+    private final ChatRepository chatRepository;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, UserProfileService userService){
+    public MessageService(MessageRepository messageRepository, UserProfileService userService, ChatRepository chatRepository){
         this.messageRepository = messageRepository;
         this.userService = userService;
+        this.chatRepository = chatRepository;
     }
 
     public Message sendMessage(String senderId, String receiverId, String content) throws UserProfileNotFoundException {
@@ -30,7 +34,21 @@ public class MessageService {
         message.setSender(sender);
         message.setReceiver(receiver);
         message.setContent(content);
-        return messageRepository.save(message);
+        message = messageRepository.save(message);
+
+        Chat chat = chatRepository.getChatByIds(senderId, receiverId);
+        if(chat == null) {
+            chat = chatRepository.getChatByIds(receiverId, senderId);
+
+            if(chat == null) {
+                chat = new Chat();
+                chat.setFirstUser(sender);
+                chat.setSecondUser(receiver);
+            }
+        }
+        chat.setLastMessage(message);
+        chatRepository.save(chat);
+        return message;
     }
 
     public List<Message> getMessages(String senderId, String receiverId) {
