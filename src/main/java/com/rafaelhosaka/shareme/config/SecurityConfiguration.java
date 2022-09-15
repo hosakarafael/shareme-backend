@@ -104,7 +104,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         //chat
         http.authorizeRequests().antMatchers(GET, "/api/chat/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
-
+        http.authorizeRequests().antMatchers(PUT, "/api/chat/markAsRead").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 
         //auth
 

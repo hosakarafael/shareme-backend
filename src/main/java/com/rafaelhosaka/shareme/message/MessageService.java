@@ -36,18 +36,25 @@ public class MessageService {
         message.setContent(content);
         message = messageRepository.save(message);
 
-        Chat chat = chatRepository.getChatByIds(senderId, receiverId);
-        if(chat == null) {
-            chat = chatRepository.getChatByIds(receiverId, senderId);
-
-            if(chat == null) {
-                chat = new Chat();
-                chat.setFirstUser(sender);
-                chat.setSecondUser(receiver);
-            }
+        Chat ownerChat = chatRepository.getChatByIds(senderId, receiverId);
+        if(ownerChat == null) {
+            ownerChat = new Chat();
+            ownerChat.setOwner(sender);
+            ownerChat.setFriend(receiver);
+            ownerChat.setRead(true);
         }
-        chat.setLastMessage(message);
-        chatRepository.save(chat);
+        Chat friendChat = chatRepository.getChatByIds(receiverId, senderId);
+        if(friendChat == null) {
+            friendChat = new Chat();
+            friendChat.setOwner(receiver);
+            friendChat.setFriend(sender);
+        }
+        ownerChat.setLastMessage(message);
+        friendChat.setLastMessage(message);
+        friendChat.setRead(false);
+        chatRepository.save(ownerChat);
+        chatRepository.save(friendChat);
+
         return message;
     }
 

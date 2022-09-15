@@ -18,11 +18,13 @@ public class Chat {
     private String id;
 
     @DBRef
-    private UserProfile firstUser;
+    private UserProfile owner;
 
     @DBRef
-    private UserProfile secondUser;
+    private UserProfile friend;
 
     @DBRef
     private Message lastMessage;
+
+    private boolean read;
 }

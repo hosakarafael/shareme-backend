@@ -7,9 +7,9 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 
 public interface ChatRepository extends MongoRepository<Chat, String> {
-    @Query("{'$or':[ {'firstUser.id': ?0}, {'secondUser.id': ?0} ] }")
+    @Query("{'owner.id': ?0}")
     List<Chat> getChatByUserId(String userId);
 
-    @Query("{'$and':[ {'firstUser.id': ?0}, {'secondUser.id': ?1} ] }")
-    Chat getChatByIds(String id1, String id2);
+    @Query("{'$and':[ {'owner.id': ?0}, {'friend.id': ?1} ] }")
+    Chat getChatByIds(String ownerId, String friendId);
 }

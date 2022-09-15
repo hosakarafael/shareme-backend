@@ -25,4 +25,9 @@ public class ChatService {
         }
         return chat;
     }
+
+    public Chat markAsRead(Chat chat) {
+        chat.setRead(true);
+        return chatRepository.save(chat);
+    }
 }
