@@ -21,13 +21,13 @@ public class ChatService {
         return chats;
     }
 
-    public Chat markAsRead(String ownerId, String friendId) {
+    public int markAsRead(String ownerId, String friendId) {
         Chat chat = chatRepository.getChatByIds(ownerId, friendId);
         if(chat != null) {
             chat.setRead(true);
-            chat = chatRepository.save(chat);
+            chatRepository.save(chat);
         }
-        return chat;
+        return unreadCount(ownerId);
 
     }
 

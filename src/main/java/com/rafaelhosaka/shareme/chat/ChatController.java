@@ -22,7 +22,7 @@ public class ChatController {
     }
 
     @PutMapping("/markAsRead")
-    public ResponseEntity<Chat> markAsRead(@RequestPart("ownerId") String ownerId, @RequestPart("friendId")String friendId ){
+    public ResponseEntity<Integer> markAsRead(@RequestPart("ownerId") String ownerId, @RequestPart("friendId")String friendId ){
         return ResponseEntity.ok().body(chatService.markAsRead(ownerId, friendId));
     }
 
