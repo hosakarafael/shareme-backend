@@ -22,7 +22,13 @@ public class ChatController {
     }
 
     @PutMapping("/markAsRead")
-    public ResponseEntity<Chat> markAsRead(@RequestBody Chat chat){
-        return ResponseEntity.ok().body(chatService.markAsRead(chat));
+    public ResponseEntity<Chat> markAsRead(@RequestPart("ownerId") String ownerId, @RequestPart("friendId")String friendId ){
+        return ResponseEntity.ok().body(chatService.markAsRead(ownerId, friendId));
     }
+
+    @GetMapping("/{userId}/unreadCount")
+    public int unreadCount(@PathVariable("userId")String userId){
+        return chatService.unreadCount(userId);
+    }
+
 }

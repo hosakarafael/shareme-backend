@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document
-public class Chat {
+public class Chat implements Comparable<Chat>{
     @Id
     private String id;
 
@@ -27,4 +27,9 @@ public class Chat {
     private Message lastMessage;
 
     private boolean read;
+
+    @Override
+    public int compareTo(Chat o) {
+        return getLastMessage().getDateSent().compareTo(o.getLastMessage().getDateSent());
+    }
 }
