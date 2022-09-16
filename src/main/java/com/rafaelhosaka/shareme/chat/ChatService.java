@@ -17,7 +17,9 @@ public class ChatService {
 
     public List<Chat> getChatByUserId(String id) {
         List<Chat> chats =  chatRepository.getChatByUserId(id);
-        Collections.sort(chats, Collections.reverseOrder());
+        if(chats != null) {
+            Collections.sort(chats, Collections.reverseOrder());
+        }
         return chats;
     }
 
