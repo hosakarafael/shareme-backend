@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Category {
     VEHICLE("vehicle"),
     APPAREL("apparel"),
+    ELECTRONIC("electronic"),
+    HOME_GOODS("home_goods"),
+    MUSICAL_INSTRUMENT("musical_instrument"),
+    GAME("game"),
     OTHER("other");
 
     private String name;
