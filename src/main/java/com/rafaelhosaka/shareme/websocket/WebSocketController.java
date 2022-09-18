@@ -2,6 +2,7 @@ package com.rafaelhosaka.shareme.websocket;
 
 import com.rafaelhosaka.shareme.exception.NotificationNotFoundException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
+import com.rafaelhosaka.shareme.friend.FriendRequest;
 import com.rafaelhosaka.shareme.message.Message;
 import com.rafaelhosaka.shareme.notification.Notification;
 import com.rafaelhosaka.shareme.notification.NotificationService;
@@ -37,8 +38,14 @@ public class WebSocketController {
 
     @MessageMapping("/message")
     public Message receiveMessage(@Payload Message message){
-        simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getId(),"/private",message);
+        simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getId(),"/message",message);
         return message;
+    }
+
+    @MessageMapping("/request")
+    public FriendRequest receiveRequest(@Payload FriendRequest request){
+        simpMessagingTemplate.convertAndSendToUser(request.getTargetUserId(),"/request",request);
+        return request;
     }
 
     @MessageMapping("/notification")
