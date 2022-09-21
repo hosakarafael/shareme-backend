@@ -29,7 +29,8 @@ public class WebSocketController {
     public ChatStatus changeStatus(@Payload ChatStatus newStatus){
         try {
             simpMessagingTemplate.convertAndSendToUser(newStatus.getId(),"/status",newStatus);
-            userProfileService.changeStatusById(newStatus.getId(), newStatus.isOnline());
+            userProfileService.changeOnlineStatusById(newStatus.getId(), newStatus.isOnline());
+            userProfileService.changeConnectionStatusById(newStatus.getId(), newStatus.isConnected());
         } catch (UserProfileNotFoundException e) {
             e.printStackTrace();
         }

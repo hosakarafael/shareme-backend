@@ -156,11 +156,19 @@ public class UserProfileService {
         return users;
     }
 
-    public void changeStatusById(String id, boolean online) throws UserProfileNotFoundException {
+    public void changeOnlineStatusById(String id, boolean online) throws UserProfileNotFoundException {
         UserProfile user = userRepository.findById(id).orElseThrow(
                 () -> new UserProfileNotFoundException("User with "+id+" not found")
         );
         user.setOnline(online);
+        userRepository.save(user);
+    }
+
+    public void changeConnectionStatusById(String id, boolean connected) throws UserProfileNotFoundException {
+        UserProfile user = userRepository.findById(id).orElseThrow(
+                () -> new UserProfileNotFoundException("User with "+id+" not found")
+        );
+        user.setConnected(connected);
         userRepository.save(user);
     }
 }

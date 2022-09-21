@@ -47,5 +47,7 @@ public class UserProfile {
 
     private LanguagePreference languagePreference;
 
+    private boolean connected;
+
     private boolean online;
 }

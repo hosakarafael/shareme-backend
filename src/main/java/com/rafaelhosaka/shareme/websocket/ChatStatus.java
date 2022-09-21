@@ -10,4 +10,5 @@ import lombok.*;
 public class ChatStatus {
     private String id;
     private boolean online;
+    private boolean connected;
 }
