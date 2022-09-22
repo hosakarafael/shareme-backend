@@ -29,6 +29,14 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
+    public Notification createFriendAcceptedNotification(FriendRequest friendRequest) throws UserProfileNotFoundException {
+        UserProfile acceptedUser = userProfileService.getUserProfileById(friendRequest.getTargetUserId());
+        FriendAcceptedNotification notification = new FriendAcceptedNotification();
+        notification.setAcceptedFriend(acceptedUser);
+        notification.setOwnerUserId(friendRequest.getRequestingUserId());
+        return notificationRepository.save(notification);
+    }
+
     public List<Notification> getNotificationsByUserId(String id) {
         return notificationRepository.getByUserId(id);
     }

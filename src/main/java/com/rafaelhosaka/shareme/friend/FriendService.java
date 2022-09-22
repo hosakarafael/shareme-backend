@@ -70,7 +70,7 @@ public class FriendService {
         return false;
     }
 
-    public List<UserProfile> acceptRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
+    public List<Object> acceptRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
         if(!friendRequestRepository.findById(friendRequest.getId()).isPresent()) {
             throw new IllegalStateException("FriendRequest does not exist");
         }
@@ -85,13 +85,15 @@ public class FriendService {
         userProfileService.update(targetUser);
 
         deleteFriendRequest(friendRequest);
+        Notification notification = notificationService.createFriendAcceptedNotification(friendRequest);
 
-        List<UserProfile> modifiedUsers = new ArrayList<>();
+        List<Object> returnData = new ArrayList<>();
 
-        modifiedUsers.add(requestingUser);
-        modifiedUsers.add(targetUser);
+        returnData.add(requestingUser);
+        returnData.add(targetUser);
+        returnData.add(notification);
 
-        return modifiedUsers;
+        return returnData;
     }
 
     public List<UserProfile> unfriend(UserProfile user1, UserProfile user2) {
