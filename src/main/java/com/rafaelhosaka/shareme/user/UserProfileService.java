@@ -171,4 +171,18 @@ public class UserProfileService {
         user.setConnected(connected);
         userRepository.save(user);
     }
+
+    public List<UserProfile> getUserFriends(String userId) throws UserProfileNotFoundException {
+        UserProfile user = userRepository.findById(userId).orElseThrow(
+                () -> new UserProfileNotFoundException("User with "+userId+" not found")
+        );
+        List<UserProfile> friends = new ArrayList<>();
+        for (String id:user.getFriends()) {
+            UserProfile friend = userRepository.findById(id).orElseThrow(
+                    () -> new UserProfileNotFoundException("User with "+userId+" not found")
+            );
+            friends.add(friend);
+        }
+        return friends;
+    }
 }

@@ -6,6 +6,7 @@ import com.rafaelhosaka.shareme.friend.FriendRequest;
 import com.rafaelhosaka.shareme.message.Message;
 import com.rafaelhosaka.shareme.notification.Notification;
 import com.rafaelhosaka.shareme.notification.NotificationService;
+import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -60,5 +61,11 @@ public class WebSocketController {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @MessageMapping("/friend")
+    public NewFriendInformation receiveNewFriend(@Payload NewFriendInformation newFriend){
+        simpMessagingTemplate.convertAndSendToUser(newFriend.getTargetUserId(),"/friend",newFriend);
+        return newFriend;
     }
 }

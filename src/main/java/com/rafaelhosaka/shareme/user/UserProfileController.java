@@ -125,6 +125,16 @@ public class UserProfileController {
         return ResponseEntity.ok(userService.getUserProfileFromIds(ids));
     }
 
+    @GetMapping("/{id}/getUserFriend")
+    public ResponseEntity<List<UserProfile>> getUserFriends(@PathVariable("id") String id){
+        try {
+            return ResponseEntity.ok(userService.getUserFriends(id));
+        } catch (UserProfileNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PutMapping("/updateUser")
     public ResponseEntity<UserProfile> updateUser(@RequestBody UserProfile user){
         return ResponseEntity.ok(userService.update(user));
