@@ -63,9 +63,15 @@ public class WebSocketController {
         }
     }
 
-    @MessageMapping("/friend")
-    public NewFriendInformation receiveNewFriend(@Payload NewFriendInformation newFriend){
-        simpMessagingTemplate.convertAndSendToUser(newFriend.getTargetUserId(),"/friend",newFriend);
-        return newFriend;
+    @MessageMapping("/newFriend")
+    public FriendInformation receiveNewFriend(@Payload FriendInformation friendInfo){
+        simpMessagingTemplate.convertAndSendToUser(friendInfo.getTargetUserId(),"/newFriend",friendInfo);
+        return friendInfo;
+    }
+
+    @MessageMapping("/removeFriend")
+    public FriendInformation receiveRemovedFriend(@Payload FriendInformation friendInfo){
+        simpMessagingTemplate.convertAndSendToUser(friendInfo.getTargetUserId(),"/removeFriend",friendInfo);
+        return friendInfo;
     }
 }

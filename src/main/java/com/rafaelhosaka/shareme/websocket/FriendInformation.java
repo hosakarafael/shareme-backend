@@ -7,8 +7,8 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class NewFriendInformation {
+public class FriendInformation {
     private String targetUserId;
-    private UserProfile newFriend;
+    private UserProfile friend;
 }
 
