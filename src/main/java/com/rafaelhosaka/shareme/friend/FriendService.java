@@ -78,6 +78,10 @@ public class FriendService {
         UserProfile requestingUser = userProfileService.getUserProfileById(friendRequest.getRequestingUserId());
         UserProfile targetUser = userProfileService.getUserProfileById(friendRequest.getTargetUserId());
 
+        if(requestingUser.getFriends().contains(targetUser.getId()) || targetUser.getFriends().contains(requestingUser.getId())){
+            throw new IllegalStateException("Users are already friends");
+        }
+
         requestingUser.getFriends().add(targetUser.getId());
         targetUser.getFriends().add(requestingUser.getId());
 
