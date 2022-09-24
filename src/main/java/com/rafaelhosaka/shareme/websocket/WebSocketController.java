@@ -44,9 +44,15 @@ public class WebSocketController {
         return message;
     }
 
-    @MessageMapping("/request")
+    @MessageMapping("/newRequest")
     public FriendRequest receiveRequest(@Payload FriendRequest request){
-        simpMessagingTemplate.convertAndSendToUser(request.getTargetUserId(),"/request",request);
+        simpMessagingTemplate.convertAndSendToUser(request.getTargetUserId(),"/newRequest",request);
+        return request;
+    }
+
+    @MessageMapping("/removeRequest")
+    public FriendRequest receiveRemovedRequest(@Payload FriendRequest request){
+        simpMessagingTemplate.convertAndSendToUser(request.getTargetUserId(),"/removeRequest",request);
         return request;
     }
 
@@ -62,6 +68,7 @@ public class WebSocketController {
             return null;
         }
     }
+
 
     @MessageMapping("/newFriend")
     public FriendInformation receiveNewFriend(@Payload FriendInformation friendInfo){
