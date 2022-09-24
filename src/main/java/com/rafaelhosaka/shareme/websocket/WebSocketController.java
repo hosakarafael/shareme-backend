@@ -53,6 +53,7 @@ public class WebSocketController {
     @MessageMapping("/removeRequest")
     public FriendRequest receiveRemovedRequest(@Payload FriendRequest request){
         simpMessagingTemplate.convertAndSendToUser(request.getTargetUserId(),"/removeRequest",request);
+        simpMessagingTemplate.convertAndSendToUser(request.getRequestingUserId(),"/removeRequest",request);
         return request;
     }
 
