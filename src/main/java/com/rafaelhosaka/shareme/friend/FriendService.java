@@ -1,5 +1,6 @@
 package com.rafaelhosaka.shareme.friend;
 
+import com.rafaelhosaka.shareme.exception.FriendRequestAlreadyExistException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.notification.FriendRequestNotification;
 import com.rafaelhosaka.shareme.notification.Notification;
@@ -33,8 +34,11 @@ public class FriendService {
         return friendRequestRepository.getPendingFriendRequest(targetUserId);
     }
 
-    public List<Object> createFriendRequest(FriendRequest friendRequest) throws UserProfileNotFoundException {
+    public List<Object> createFriendRequest(FriendRequest friendRequest) throws UserProfileNotFoundException, FriendRequestAlreadyExistException {
         List<Object> returnData = new ArrayList<>();
+        if(friendRequestRepository.getFriendRequestFromIds(friendRequest.getTargetUserId(), friendRequest.getRequestingUserId()) != null){
+            throw  new FriendRequestAlreadyExistException("FriendRequest with target user "+friendRequest.getTargetUserId()+" and requesting user "+friendRequest.getRequestingUserId()+" already exist");
+        }
         Notification notification = notificationService.createFriendRequestNotification(friendRequest);
         FriendRequest request = friendRequestRepository.save(friendRequest);
         returnData.add(request);

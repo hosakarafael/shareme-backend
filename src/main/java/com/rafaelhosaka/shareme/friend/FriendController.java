@@ -1,5 +1,6 @@
 package com.rafaelhosaka.shareme.friend;
 
+import com.rafaelhosaka.shareme.exception.FriendRequestAlreadyExistException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.utils.JsonConverter;
@@ -38,7 +39,7 @@ public class FriendController {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/friend/createRequest").toUriString());
         try {
             return ResponseEntity.created(uri).body(friendService.createFriendRequest(friendRequest));
-        } catch (UserProfileNotFoundException e) {
+        } catch (UserProfileNotFoundException | FriendRequestAlreadyExistException e) {
             e.printStackTrace();
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
