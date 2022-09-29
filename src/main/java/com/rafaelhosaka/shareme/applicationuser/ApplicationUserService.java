@@ -6,6 +6,7 @@ import com.rafaelhosaka.shareme.email.EmailTokenRepository;
 import com.rafaelhosaka.shareme.exception.*;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileRepository;
+import com.rafaelhosaka.shareme.user.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +32,23 @@ public class ApplicationUserService implements UserDetailsService {
     private final EmailTokenRepository emailTokenRepository;
     private final EmailService emailService;
     private final UserProfileRepository userProfileRepository;
+    private final UserProfileService userProfileService;
 
     @Autowired
-    public ApplicationUserService(ApplicationUserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, EmailTokenRepository emailTokenRepository, EmailService emailService, UserProfileRepository userProfileRepository) {
+    public ApplicationUserService(ApplicationUserRepository userRepository,
+                                  RoleRepository roleRepository,
+                                  PasswordEncoder encoder,
+                                  EmailTokenRepository emailTokenRepository,
+                                  EmailService emailService,
+                                  UserProfileRepository userProfileRepository,
+                                  UserProfileService userProfileService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
         this.emailTokenRepository = emailTokenRepository;
         this.emailService = emailService;
         this.userProfileRepository = userProfileRepository;
+        this.userProfileService = userProfileService;
     }
 
     @Override
@@ -58,28 +67,34 @@ public class ApplicationUserService implements UserDetailsService {
                 applicationUser.isAccountNonExpired(),
                 applicationUser.isCredentialsNonExpired(),
                 applicationUser.getAuthorities()
-         );
+        );
     }
 
-    public ApplicationUser saveUser(ApplicationUser user) throws ApplicationUserNotFoundException {
-        log.info("save user {}",user.getUsername());
-        if(user.getUsername().isEmpty()){
-            throw new IllegalStateException("Username cannot be empty");
+    public ApplicationUser createAccount(ApplicationUser applicationUser, UserProfile userProfile) throws ApplicationUserNotFoundException {
+        log.info("save applicationUser {}",applicationUser.getUsername());
+        if(applicationUser.getUsername() == null || applicationUser.getUsername().trim().isEmpty()){
+            throw new IllegalStateException("errorUsernameEmpty");
         }
 
-        if(user.getPassword().isEmpty()) {
-            throw new IllegalStateException("Password cannot be empty");
+        if(applicationUser.getPassword() == null || applicationUser.getPassword().trim().isEmpty()) {
+            throw new IllegalStateException("errorPasswordEmpty");
         }
 
-        if(userRepository.findByUsername(user.getUsername()).isPresent()){
-            throw new IllegalStateException("This username is already registered");
+        if(userRepository.findByUsername(applicationUser.getUsername()).isPresent()){
+            throw new IllegalStateException("errorUsernameAlreadyRegistered");
+        }
+        applicationUser.setPassword(encoder.encode(applicationUser.getPassword()));
+
+        try {
+            applicationUser = userRepository.save(applicationUser);
+            addRoleToUser(applicationUser.getUsername(), "ROLE_USER");
+            userProfileService.save(userProfile);
+        }catch (IllegalStateException exception){
+            userRepository.delete(applicationUser);
+            throw exception;
         }
 
-        user.setPassword(encoder.encode(user.getPassword()));
-        user = userRepository.save(user);
-        addRoleToUser(user.getUsername(), "ROLE_USER");
-
-        return user;
+        return applicationUser;
     }
 
     public Role saveRole(Role role){

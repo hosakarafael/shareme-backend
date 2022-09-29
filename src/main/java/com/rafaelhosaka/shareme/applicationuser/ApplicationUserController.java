@@ -1,14 +1,18 @@
 package com.rafaelhosaka.shareme.applicationuser;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelhosaka.shareme.email.EmailService;
 import com.rafaelhosaka.shareme.email.OnRegistrationCompleteEvent;
 import com.rafaelhosaka.shareme.exception.*;
 import com.rafaelhosaka.shareme.jwt.JwtUtils;
+import com.rafaelhosaka.shareme.user.UserProfile;
+import com.rafaelhosaka.shareme.utils.JsonConverter;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -48,13 +52,16 @@ public class ApplicationUserController {
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
-    @PostMapping("/user/save")
-    public ResponseEntity<ApplicationUser> saveUser(@RequestBody ApplicationUser applicationUser){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth/user/save").toUriString());
+    @PostMapping("/user/createAccount")
+    public ResponseEntity<ApplicationUser> createAccount(@RequestPart("appUser") String jsonAppUser, @RequestPart("userProfile") String jsonUserProfile){
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth/user/createAccount").toUriString());
         try {
-            ApplicationUser user = userService.saveUser(applicationUser);
+            ApplicationUser applicationUser = (ApplicationUser) JsonConverter.convertJsonToObject(jsonAppUser, ApplicationUser.class);
+            UserProfile userProfile
+                    = (UserProfile) JsonConverter.convertJsonToObject(jsonUserProfile, UserProfile.class);
+            ApplicationUser user = userService.createAccount(applicationUser, userProfile);
             return ResponseEntity.created(uri).body(user);
-        }catch(IllegalStateException | ApplicationUserNotFoundException e){
+        }catch(IllegalStateException | ApplicationUserNotFoundException | JsonProcessingException e){
             return new ResponseEntity(e.getMessage(), BAD_REQUEST);
         }
     }
@@ -65,7 +72,7 @@ public class ApplicationUserController {
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
-    @PostMapping("/role/addtouser")
+    @PostMapping("/role/addToUser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form){
         try {
             userService.addRoleToUser(form.getUsername(), form.getRoleName());

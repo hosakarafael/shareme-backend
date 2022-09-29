@@ -44,26 +44,26 @@ public class UserProfileService {
         );
     }
 
-    public UserProfile save(UserProfile userProfile) {
+    public UserProfile save(UserProfile userProfile) throws IllegalStateException {
 
         if(userRepository.findUserProfileByEmail(userProfile.getEmail()).isPresent()){
-            throw new IllegalStateException("This email is already registered");
+            throw new IllegalStateException("errorUsernameAlreadyRegistered");
         }
 
         if(!Validator.isValidDate(userProfile.getBirthDate())){
-            throw new IllegalStateException("Invalid date");
+            throw new IllegalStateException("errorInvalidDate");
         }
-        if(userProfile.getEmail().isEmpty()){
-            throw new IllegalStateException("Email cannot be empty");
+        if(userProfile.getEmail() == null || userProfile.getEmail().trim().isEmpty()){
+            throw new IllegalStateException("errorUsernameEmpty");
         }
-        if(userProfile.getFirstName().isEmpty()){
-            throw new IllegalStateException("First name cannot be empty");
+        if(userProfile.getFirstName() == null || userProfile.getFirstName().trim().isEmpty()){
+            throw new IllegalStateException("errorFirstNameEmpty");
         }
-        if(userProfile.getLastName().isEmpty()){
-            throw new IllegalStateException("Last name cannot be empty");
+        if(userProfile.getLastName() == null || userProfile.getLastName().trim().isEmpty()){
+            throw new IllegalStateException("errorLastNameEmpty");
         }
-        if(userProfile.getGender().getName().equals("")){
-            throw new IllegalStateException("Gender cannot be empty");
+        if(userProfile.getGender() == null || userProfile.getGender().getName().equals("")){
+            throw new IllegalStateException("errorGenderEmpty");
         }
 
         userProfile.setThemePreference(ThemePreference.DEVICE);

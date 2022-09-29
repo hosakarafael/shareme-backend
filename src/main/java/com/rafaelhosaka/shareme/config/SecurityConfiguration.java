@@ -123,7 +123,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/api/resend/**",
                 "/api/recovery/**",
                 "/api/auth/login/**",
-                "/api/auth/user/save/**",
+                "/api/auth/user/createAccount/**",
                 "/api/auth/refresh/**",
                 "/api/auth/password/token",
                 "/api/post/download/**",
