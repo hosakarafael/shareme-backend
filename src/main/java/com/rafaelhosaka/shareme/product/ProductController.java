@@ -30,6 +30,11 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.getAll());
     }
 
+    @GetMapping("/{category}")
+    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable("category") String category){
+        return ResponseEntity.ok().body(productService.getByCategory(category));
+    }
+
     @PostMapping(path = "/create",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Product> createProduct(@RequestPart("product") String json, @RequestPart(value = "file", required = false) MultipartFile file){

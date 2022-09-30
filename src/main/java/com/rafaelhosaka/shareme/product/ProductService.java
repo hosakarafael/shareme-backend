@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +29,16 @@ public class ProductService {
 
     public List<Product> getAll() {
         return productRepository.findAll();
+    }
+
+    public List<Product> getByCategory(String category) {
+        Category categoryObj;
+        try {
+            categoryObj = Category.valueOf(category.toUpperCase());
+        }catch (IllegalArgumentException e){
+            return new ArrayList<>();
+        }
+        return productRepository.getProductByCategory(categoryObj);
     }
 
     public Product createPost(Product product, MultipartFile file) {
@@ -57,4 +68,6 @@ public class ProductService {
                 String.format("%s/%s", BucketName.PRODUCTS.getName(), productId) ,
                 product.getFileName());
     }
+
+
 }
