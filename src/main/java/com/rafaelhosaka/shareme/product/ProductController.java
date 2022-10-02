@@ -48,9 +48,9 @@ public class ProductController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadPostImage(@PathVariable("id") String id)  {
+    public ResponseEntity<List<String>> downloadPostImage(@PathVariable("id") String id)  {
         try {
-            return ResponseEntity.ok().body(Base64.getEncoder().encode(productService.downloadProductImage(id)));
+            return ResponseEntity.ok().body(productService.downloadProductImage(id));
         }catch (ProductNotFoundException | IllegalStateException e) {
             return null;
         }

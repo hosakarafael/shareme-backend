@@ -43,13 +43,12 @@ public class FileStore {
         }
     }
 
-    public byte[] download(String path, String key){
+    public S3Object download(String path, String key){
         try{
             if(key == null || key.isEmpty() ) {
-                return new byte[0];
+                return null;
             }else{
-                S3Object object = s3.getObject(path, key);
-                return IOUtils.toByteArray(object.getObjectContent());
+                return s3.getObject(path, key);
             }
         }catch (Exception e){
             throw  new IllegalStateException(e);
@@ -66,4 +65,5 @@ public class FileStore {
         metadata.put("Content-Length", String.valueOf(file.getSize()));
         return  metadata;
     }
+
 }

@@ -14,5 +14,6 @@ import java.util.*;
 @Document(collection = "post")
 public class Post extends  BasePost{
     private String fileName; //S3 key
+    private String fileType;
     private Set<String> sharedUsersId = new HashSet<>();
 }

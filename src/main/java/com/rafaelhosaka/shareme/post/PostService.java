@@ -1,6 +1,8 @@
 package com.rafaelhosaka.shareme.post;
 
 
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.util.IOUtils;
 import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.comment.Comment;
 import com.rafaelhosaka.shareme.comment.CommentService;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,6 +54,7 @@ public class PostService {
 
             String fileName =  String.format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
             post.setFileName(fileName);
+            post.setFileType(file.getContentType());
             post.setDateCreated(LocalDateTime.now());
             post = save(post);
 
@@ -66,11 +70,20 @@ public class PostService {
         return post;
     }
 
-    public byte[] downloadPostImage(String postId) throws PostNotFoundException {
+    public List<String> downloadPostImage(String postId) throws PostNotFoundException {
         Post post = (Post) getPostById(postId);
-        return fileStore.download(
-                String.format("%s/%s", BucketName.POSTS.getName(), postId) ,
-                post.getFileName());
+        List returnData = new ArrayList();
+        try{
+            S3Object object =  fileStore.download(
+                    String.format("%s/%s", BucketName.POSTS.getName(), postId) ,
+                    post.getFileName());
+            byte[] encoded = object == null ? new byte[0] : Base64.getEncoder().encode(IOUtils.toByteArray(object.getObjectContent()));
+            returnData.add(new String(encoded, StandardCharsets.US_ASCII));
+            returnData.add(post.getFileType());
+            return returnData;
+        }catch (Exception e){
+            throw new IllegalStateException(e);
+        }
     }
 
 

@@ -1,14 +1,10 @@
 package com.rafaelhosaka.shareme.post;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rafaelhosaka.shareme.exception.CommentNotFoundException;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
-import com.rafaelhosaka.shareme.user.UserProfileService;
 import com.rafaelhosaka.shareme.utils.JsonConverter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +14,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -72,9 +67,9 @@ public class PostController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadPostImage(@PathVariable("id") String id)  {
+    public ResponseEntity<List<String>> downloadPostImage(@PathVariable("id") String id)  {
         try {
-            return ResponseEntity.ok().body(Base64.getEncoder().encode(postService.downloadPostImage(id)));
+            return ResponseEntity.ok().body(postService.downloadPostImage(id));
         }catch (PostNotFoundException e){
             log.error("Exception : {}",e.getMessage());
             return null;

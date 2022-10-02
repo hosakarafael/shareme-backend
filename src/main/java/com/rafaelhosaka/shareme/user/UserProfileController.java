@@ -75,9 +75,9 @@ public class UserProfileController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadProfileUserImage(@PathVariable("id") String id)  {
+    public ResponseEntity<List<String>> downloadProfileUserImage(@PathVariable("id") String id)  {
         try {
-            return ResponseEntity.ok().body(Base64.getEncoder().encode(userService.downloadProfileImage(id)));
+            return ResponseEntity.ok().body(userService.downloadProfileImage(id));
         }catch (Exception e){
             log.error("Exception : {}",e.getMessage());
             return ResponseEntity.noContent().build();
@@ -85,9 +85,9 @@ public class UserProfileController {
     }
 
     @GetMapping("/downloadCoverImage/{id}")
-    public ResponseEntity<byte[]> downloadCoverImage(@PathVariable("id") String id)  {
+    public ResponseEntity<List<String>> downloadCoverImage(@PathVariable("id") String id)  {
         try {
-            return ResponseEntity.ok().body(Base64.getEncoder().encode(userService.downloadCoverImage(id)));
+            return ResponseEntity.ok().body(userService.downloadCoverImage(id));
         }catch (Exception e){
             log.error("Exception : {}",e.getMessage());
             return ResponseEntity.noContent().build();

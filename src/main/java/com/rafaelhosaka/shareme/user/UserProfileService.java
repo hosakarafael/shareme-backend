@@ -1,5 +1,7 @@
 package com.rafaelhosaka.shareme.user;
 
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.util.IOUtils;
 import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
@@ -11,11 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserProfileService {
@@ -82,18 +82,38 @@ public class UserProfileService {
         );
     }
 
-    public byte[] downloadProfileImage(String userId) throws UserProfileNotFoundException , IllegalStateException{
+    public List<String> downloadProfileImage(String userId) throws UserProfileNotFoundException , IllegalStateException{
         UserProfile user = getUserProfileById(userId);
-        return fileStore.download(
-                String.format("%s/%s", BucketName.USERS.getName(), userId) ,
-                user.getFileName());
+        List returnData = new ArrayList();
+
+        try{
+            S3Object object = fileStore.download(
+                    String.format("%s/%s", BucketName.USERS.getName(), userId) ,
+                    user.getFileName());
+            byte[] encoded = object == null ? new byte[0] : Base64.getEncoder().encode(IOUtils.toByteArray(object.getObjectContent()));
+            returnData.add(new String(encoded, StandardCharsets.US_ASCII));
+            returnData.add(object.getObjectMetadata().getUserMetadata().get("content-type"));
+            return returnData;
+         }catch (Exception e){
+            throw new IllegalStateException(e);
+        }
     }
 
-    public byte[] downloadCoverImage(String userId) throws UserProfileNotFoundException , IllegalStateException{
+    public List<String> downloadCoverImage(String userId) throws UserProfileNotFoundException , IllegalStateException{
         UserProfile user = getUserProfileById(userId);
-        return fileStore.download(
+        List returnData = new ArrayList();
+
+        try{
+         S3Object object  = fileStore.download(
                 String.format("%s/%s", BucketName.USERS.getName(), userId) ,
                 user.getCoverFileName());
+        byte[] encoded = object == null ? new byte[0] : Base64.getEncoder().encode(IOUtils.toByteArray(object.getObjectContent()));
+        returnData.add(new String(encoded, StandardCharsets.US_ASCII));
+        returnData.add(object.getObjectMetadata().getUserMetadata().get("content-type"));
+        return returnData;
+    }catch (Exception e){
+        throw new IllegalStateException(e);
+    }
     }
 
     public UserProfile uploadCoverImage(String userId, MultipartFile file) throws UserProfileNotFoundException {

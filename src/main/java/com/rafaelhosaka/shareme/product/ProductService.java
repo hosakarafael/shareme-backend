@@ -1,5 +1,7 @@
 package com.rafaelhosaka.shareme.product;
 
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.util.IOUtils;
 import com.rafaelhosaka.shareme.bucket.BucketName;
 import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.exception.ProductNotFoundException;
@@ -10,11 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ProductService {
@@ -60,13 +60,22 @@ public class ProductService {
         return product;
     }
 
-    public byte[] downloadProductImage(String productId) throws ProductNotFoundException {
+    public List<String> downloadProductImage(String productId) throws ProductNotFoundException {
         Product product =  productRepository.findById(productId).orElseThrow(
                 () -> new ProductNotFoundException("Product with id "+productId+" not found")
         );
-        return fileStore.download(
-                String.format("%s/%s", BucketName.PRODUCTS.getName(), productId) ,
-                product.getFileName());
+        List returnData = new ArrayList();
+        try {
+            S3Object object = fileStore.download(
+                    String.format("%s/%s", BucketName.PRODUCTS.getName(), productId),
+                    product.getFileName());
+            byte[] encoded = object == null ? new byte[0] : Base64.getEncoder().encode(IOUtils.toByteArray(object.getObjectContent()));
+            returnData.add(new String(encoded, StandardCharsets.US_ASCII));
+            returnData.add(object.getObjectMetadata().getUserMetadata().get("content-type"));
+            return returnData;
+        }catch (Exception e){
+            throw new IllegalStateException(e);
+        }
     }
 
 
