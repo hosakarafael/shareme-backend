@@ -108,4 +108,9 @@ public class PostController {
     public ResponseEntity<List<BasePost>> getGroupPosts(@PathVariable("id")String groupId){
         return ResponseEntity.ok().body(postService.getGroupPosts(groupId));
     }
+
+    @GetMapping("/group/all/{id}")
+    public ResponseEntity<List<BasePost>> getAllGroupsPosts(@PathVariable("id")String userId){
+        return ResponseEntity.ok().body(postService.getAllGroupPosts(userId));
+    }
 }

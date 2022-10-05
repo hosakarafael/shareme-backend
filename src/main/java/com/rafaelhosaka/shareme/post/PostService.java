@@ -11,6 +11,8 @@ import com.rafaelhosaka.shareme.exception.PostNotFoundException;
 import com.rafaelhosaka.shareme.exception.UserProfileNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
 
+import com.rafaelhosaka.shareme.group.Group;
+import com.rafaelhosaka.shareme.group.GroupRepository;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileRepository;
 import com.rafaelhosaka.shareme.visibility.Visibility;
@@ -33,13 +35,19 @@ public class PostService {
     private final CommentService commentService;
     private final UserProfileRepository userRepository;
     private final FileStore fileStore;
+    private final GroupRepository groupRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository, CommentService commentService, FileStore fileStore, UserProfileRepository userRepository) {
+    public PostService(PostRepository postRepository,
+                       CommentService commentService,
+                       FileStore fileStore,
+                       UserProfileRepository userRepository,
+                       GroupRepository groupRepository) {
         this.postRepository = postRepository;
         this.commentService = commentService;
         this.fileStore = fileStore;
         this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
     }
 
     public List<BasePost> getAll() {
@@ -159,5 +167,15 @@ public class PostService {
 
     public List<BasePost> getGroupPosts(String groupId) {
         return postRepository.getGroupPosts(groupId);
+    }
+
+    public List<BasePost> getAllGroupPosts(String userId) {
+        List<BasePost> posts = new ArrayList<>();
+        List<Group> groups = groupRepository.getGroupsByUserId(userId);
+        for (Group group: groups) {
+            posts.addAll(getGroupPosts(group.getId()));
+        }
+
+        return posts;
     }
 }
