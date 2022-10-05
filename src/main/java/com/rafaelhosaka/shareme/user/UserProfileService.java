@@ -92,7 +92,7 @@ public class UserProfileService {
                     user.getFileName());
             byte[] encoded = object == null ? new byte[0] : Base64.getEncoder().encode(IOUtils.toByteArray(object.getObjectContent()));
             returnData.add(new String(encoded, StandardCharsets.US_ASCII));
-            returnData.add(object.getObjectMetadata().getUserMetadata().get("content-type"));
+            returnData.add(object == null ? "" : object.getObjectMetadata().getUserMetadata().get("content-type"));
             return returnData;
          }catch (Exception e){
             throw new IllegalStateException(e);
@@ -109,7 +109,7 @@ public class UserProfileService {
                 user.getCoverFileName());
         byte[] encoded = object == null ? new byte[0] : Base64.getEncoder().encode(IOUtils.toByteArray(object.getObjectContent()));
         returnData.add(new String(encoded, StandardCharsets.US_ASCII));
-        returnData.add(object.getObjectMetadata().getUserMetadata().get("content-type"));
+        returnData.add(object == null ? "" : object.getObjectMetadata().getUserMetadata().get("content-type"));
         return returnData;
     }catch (Exception e){
         throw new IllegalStateException(e);

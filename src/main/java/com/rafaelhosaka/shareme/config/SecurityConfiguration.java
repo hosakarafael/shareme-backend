@@ -106,6 +106,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(GET, "/api/chat/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(PUT, "/api/chat/markAsRead").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 
+        //group
+        http.authorizeRequests().antMatchers(GET, "/api/group/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(POST, "/api/group/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
+
         //auth
 
         http.authorizeRequests().antMatchers(PUT, "/password/username").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");

@@ -11,7 +11,7 @@ public interface UserProfileRepository extends MongoRepository<UserProfile, Stri
 
     Optional<UserProfile> findUserProfileByEmail(String email);
 
-    @Query("{ 'firstName' : { $regex: ?0, $options: 'i'  }}")
+    @Query("{'$or': [ {'firstName' : { $regex: ?0, $options: 'i'  }}, {'lastName' : { $regex: ?0, $options: 'i'  }} ]}")
     List<UserProfile> searchUsersContainsName(String name);
 
 }

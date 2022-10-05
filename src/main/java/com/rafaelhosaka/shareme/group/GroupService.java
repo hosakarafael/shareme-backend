@@ -1,16 +1,21 @@
 package com.rafaelhosaka.shareme.group;
 
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.util.IOUtils;
 import com.rafaelhosaka.shareme.bucket.BucketName;
+import com.rafaelhosaka.shareme.exception.GroupNotFoundException;
 import com.rafaelhosaka.shareme.filestore.FileStore;
+import com.rafaelhosaka.shareme.post.Post;
+import com.rafaelhosaka.shareme.user.UserProfile;
+import com.rafaelhosaka.shareme.utils.Format;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class GroupService {
@@ -48,5 +53,40 @@ public class GroupService {
 
     public List<Group> getGroupsByUserId(String userId) {
         return groupRepository.getGroupsByUserId(userId);
+    }
+
+    public List<Group> getAllGroups() {
+        return groupRepository.findAll();
+    }
+
+    public List<Group> searchGroupsContainsName(String searchedName) {
+        try {
+            return groupRepository.searchGroupsContainsName(Format.escapeMetaCharacters(searchedName));
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<String> downloadGroupImage(String groupId) throws GroupNotFoundException {
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new GroupNotFoundException("Group with id "+groupId+" not found")
+        );
+        List returnData = new ArrayList();
+        try{
+            S3Object object =  fileStore.download(
+                    String.format("%s/%s", BucketName.GROUPS.getName(), groupId) ,
+                    group.getFileName());
+            byte[] encoded = object == null ? new byte[0] : Base64.getEncoder().encode(IOUtils.toByteArray(object.getObjectContent()));
+            returnData.add(new String(encoded, StandardCharsets.US_ASCII));
+            returnData.add(object == null ? "" : object.getObjectMetadata().getUserMetadata().get("content-type"));
+            return returnData;
+        }catch (Exception e){
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public Group getGroupById(String groupId) throws GroupNotFoundException {
+        return groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("group with id "+groupId+" not found"));
     }
 }
