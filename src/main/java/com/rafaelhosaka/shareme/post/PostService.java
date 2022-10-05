@@ -13,6 +13,8 @@ import com.rafaelhosaka.shareme.filestore.FileStore;
 
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileRepository;
+import com.rafaelhosaka.shareme.visibility.Visibility;
+import com.rafaelhosaka.shareme.visibility.VisibilityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -45,13 +47,18 @@ public class PostService {
     }
 
     public Post save(Post post) {
+        if(post.getVisibility() == null){
+            post.setVisibility(new Visibility(VisibilityType.PUBLIC, new ArrayList<>()));
+        }
         post.setDateCreated(LocalDateTime.now());
         return postRepository.save(post);
     }
 
     public Post savePostWithImage(Post post, MultipartFile file) {
         try {
-
+            if(post.getVisibility() == null){
+                post.setVisibility(new Visibility(VisibilityType.PUBLIC, new ArrayList<>()));
+            }
             String fileName =  String.format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
             post.setFileName(fileName);
             post.setFileType(file.getContentType());
@@ -148,5 +155,9 @@ public class PostService {
 
     public Post updatePost(Post post) {
         return postRepository.save(post);
+    }
+
+    public List<BasePost> getGroupPosts(String groupId) {
+        return postRepository.getGroupPosts(groupId);
     }
 }

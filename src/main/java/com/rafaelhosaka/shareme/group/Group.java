@@ -1,5 +1,6 @@
 package com.rafaelhosaka.shareme.group;
 
+import com.rafaelhosaka.shareme.post.Post;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import lombok.AllArgsConstructor;
 import lombok.Data;

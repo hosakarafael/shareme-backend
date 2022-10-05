@@ -52,7 +52,7 @@ public class PostController {
             path = "/upload",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
     )
-    public ResponseEntity<Post> savePostWithImage(@RequestPart("post") String json,@Nullable @RequestPart(value = "file", required = false) MultipartFile file) {
+    public ResponseEntity<Post> savePost(@RequestPart("post") String json,@Nullable @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
             Post post = (Post) JsonConverter.convertJsonToObject(json, Post.class);
             if(file != null) {
@@ -102,5 +102,10 @@ public class PostController {
     @PutMapping("/update")
     public ResponseEntity<Post> updatePost(@RequestBody Post post){
         return ResponseEntity.ok().body(postService.updatePost(post));
+    }
+
+    @GetMapping("/group/{id}")
+    public ResponseEntity<List<BasePost>> getGroupPosts(@PathVariable("id")String groupId){
+        return ResponseEntity.ok().body(postService.getGroupPosts(groupId));
     }
 }

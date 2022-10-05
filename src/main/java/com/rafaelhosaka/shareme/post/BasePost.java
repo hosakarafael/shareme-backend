@@ -3,6 +3,7 @@ package com.rafaelhosaka.shareme.post;
 import com.rafaelhosaka.shareme.comment.Comment;
 import com.rafaelhosaka.shareme.like.Like;
 import com.rafaelhosaka.shareme.user.UserProfile;
+import com.rafaelhosaka.shareme.visibility.Visibility;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,4 +34,6 @@ public abstract class BasePost {
 
     @DBRef
     private List<Comment> comments = new ArrayList<>();
+
+    private Visibility visibility;
 }
