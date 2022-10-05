@@ -57,6 +57,18 @@ public class GroupController {
         }
     }
 
+    @PutMapping(
+            path = "/uploadCoverImage",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
+    public ResponseEntity<Group> uploadCoverImage(@RequestPart("groupId") String groupId, @RequestPart(value = "file") MultipartFile file) {
+        try {
+            return ResponseEntity.ok().body(groupService.uploadCoverImage(groupId, file));
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/download/{id}")
     public ResponseEntity<List<String>> downloadGroupImage(@PathVariable("id") String id)  {
         try {

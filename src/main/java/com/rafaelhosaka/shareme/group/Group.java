@@ -27,7 +27,7 @@ public class Group {
 
     private String name;
 
-    private String fileName;
+    private String coverFileName;
 
     private LocalDateTime dateCreated;
 }

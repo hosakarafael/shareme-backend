@@ -34,7 +34,7 @@ public class GroupService {
             group = groupRepository.save(group);
         }else{
             String fileName =  String.format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
-            group.setFileName(fileName);
+            group.setCoverFileName(fileName);
             group = groupRepository.save(group);
 
             try {
@@ -76,7 +76,7 @@ public class GroupService {
         try{
             S3Object object =  fileStore.download(
                     String.format("%s/%s", BucketName.GROUPS.getName(), groupId) ,
-                    group.getFileName());
+                    group.getCoverFileName());
             byte[] encoded = object == null ? new byte[0] : Base64.getEncoder().encode(IOUtils.toByteArray(object.getObjectContent()));
             returnData.add(new String(encoded, StandardCharsets.US_ASCII));
             returnData.add(object == null ? "" : object.getObjectMetadata().getUserMetadata().get("content-type"));
@@ -88,5 +88,25 @@ public class GroupService {
 
     public Group getGroupById(String groupId) throws GroupNotFoundException {
         return groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("group with id "+groupId+" not found"));
+    }
+
+    public Group uploadCoverImage(String groupId, MultipartFile file) throws GroupNotFoundException {
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new GroupNotFoundException("Group with id "+groupId+" not found")
+        );
+        String fileName =  String.format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
+        group.setCoverFileName(fileName);
+        group = groupRepository.save(group);
+
+        try {
+            fileStore.upload(
+                    String.format("%s/%s", BucketName.GROUPS.getName(), group.getId()),
+                    fileName,
+                    Optional.of(fileStore.getMetadata(file)),
+                    file.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return group;
     }
 }
