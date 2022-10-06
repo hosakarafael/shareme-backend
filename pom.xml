@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.rafaelhosaka</groupId>
 	<artifactId>shareme</artifactId>
-	<version>1.23.15</version>
+	<version>1.23.16</version>
 	<name>shareme</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>

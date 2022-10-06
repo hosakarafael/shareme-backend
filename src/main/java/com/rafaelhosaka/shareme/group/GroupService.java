@@ -109,4 +109,12 @@ public class GroupService {
         }
         return group;
     }
+
+    public Group join(String groupId, String userId) throws GroupNotFoundException {
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new GroupNotFoundException("Group with id "+groupId+" not found")
+        );
+        group.getMembers().add(userId);
+        return groupRepository.save(group);
+    }
 }

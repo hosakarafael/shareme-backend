@@ -77,4 +77,13 @@ public class GroupController {
             return ResponseEntity.noContent().build();
         }
     }
+
+    @PutMapping("/join")
+    public ResponseEntity<Group> join(@RequestPart("groupId") String groupId, @RequestPart("userId")String userId)  {
+        try {
+            return ResponseEntity.ok().body(groupService.join(groupId, userId));
+        }catch (Exception e){
+            return ResponseEntity.noContent().build();
+        }
+    }
 }
