@@ -117,4 +117,12 @@ public class GroupService {
         group.getMembers().add(userId);
         return groupRepository.save(group);
     }
+
+    public Group leave(String groupId, String userId) throws GroupNotFoundException {
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new GroupNotFoundException("Group with id "+groupId+" not found")
+        );
+        group.getMembers().remove(userId);
+        return groupRepository.save(group);
+    }
 }

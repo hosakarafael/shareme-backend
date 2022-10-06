@@ -86,4 +86,13 @@ public class GroupController {
             return ResponseEntity.noContent().build();
         }
     }
+
+    @PutMapping("/leave")
+    public ResponseEntity<Group> leave(@RequestPart("groupId") String groupId, @RequestPart("userId")String userId)  {
+        try {
+            return ResponseEntity.ok().body(groupService.leave(groupId, userId));
+        }catch (Exception e){
+            return ResponseEntity.noContent().build();
+        }
+    }
 }
