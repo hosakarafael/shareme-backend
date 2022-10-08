@@ -153,6 +153,9 @@ public class PostService {
         sharedPost.setDateCreated(LocalDateTime.now());
         sharedPost.setUser(user);
         sharedPost.setSharedPost(post);
+        if(sharedPost.getVisibility() == null){
+            sharedPost.setVisibility(new Visibility(VisibilityType.PUBLIC, new ArrayList<>()));
+        }
         result.add(postRepository.save(sharedPost));
 
         post.getSharedUsersId().add(sharingUserId);
