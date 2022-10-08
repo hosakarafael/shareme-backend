@@ -5,8 +5,9 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.IOUtils;
-import com.rafaelhosaka.shareme.bucket.BucketName;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,11 +18,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@PropertySource("classpath:application.properties")
 public class FileStore {
     private final AmazonS3 s3;
+    private Environment environment;
 
     @Autowired
-    public FileStore(AmazonS3 s3) {
+    public FileStore(AmazonS3 s3, Environment environment) {
+        this.environment = environment;
         this.s3 = s3;
     }
 
@@ -37,7 +41,7 @@ public class FileStore {
         });
 
         try{
-            s3.putObject(path, fileName, inputStream, metadata);
+            s3.putObject(environment.getProperty("aws.bucket.name") + path,  fileName, inputStream, metadata);
         }catch (AmazonServiceException e){
             throw new IllegalStateException("Failed to store file to s3",e);
         }
@@ -48,7 +52,7 @@ public class FileStore {
             if(key == null || key.isEmpty() ) {
                 return null;
             }else{
-                return s3.getObject(path, key);
+                return s3.getObject(environment.getProperty("aws.bucket.name")  + path, key);
             }
         }catch (Exception e){
             throw  new IllegalStateException(e);
