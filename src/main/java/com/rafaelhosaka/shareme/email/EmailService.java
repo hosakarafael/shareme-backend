@@ -10,6 +10,8 @@ import com.rafaelhosaka.shareme.user.LanguagePreference;
 import com.rafaelhosaka.shareme.user.UserProfile;
 import com.rafaelhosaka.shareme.user.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,22 +26,27 @@ import java.util.UUID;
 
 
 @Service
+@PropertySource("classpath:application.properties")
 public class EmailService{
 
     private JavaMailSender emailSender;
     private EmailTokenRepository emailRepository;
     private ApplicationUserRepository userRepository;
     private UserProfileRepository userProfileRepository;
+    private Environment environment;
 
-    private final String FROM = "shareme.authentication@gmail.com";
-    private final String URL = "http://localhost:3000";
+    private final String FROM;
+    private final String URL;
 
     @Autowired
-    public EmailService(JavaMailSender emailSender, EmailTokenRepository emailRepository, ApplicationUserRepository userRepository, UserProfileRepository userProfileRepository){
+    public EmailService(JavaMailSender emailSender, EmailTokenRepository emailRepository, ApplicationUserRepository userRepository, UserProfileRepository userProfileRepository, Environment enviroment){
         this.emailRepository = emailRepository;
         this.emailSender = emailSender;
         this.userRepository = userRepository;
         this.userProfileRepository = userProfileRepository;
+        this.environment = enviroment;
+        this.URL = environment.getProperty("project.client.url");
+        this.FROM = environment.getProperty("spring.mail.username");
     }
 
     public void sendVerificationEmail(
