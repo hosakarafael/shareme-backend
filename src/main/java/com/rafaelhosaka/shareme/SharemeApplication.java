@@ -9,7 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
+import io.github.cdimascio.dotenv.Dotenv;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -17,8 +17,12 @@ import java.util.ArrayList;
 public class SharemeApplication {
 
 	public static void main(String[] args) {
+		Dotenv dotenv = Dotenv.load();
+		System.setProperty("PROJECT_CLIENT_URL", dotenv.get("PROJECT_CLIENT_URL"));
+		System.setProperty("SPRING_DATA_MONGODB_URI", dotenv.get("SPRING_DATA_MONGODB_URI"));
+		System.setProperty("SPRING_DATA_MONGODB_DATABASE", dotenv.get("SPRING_DATA_MONGODB_DATABASE"));
+		System.setProperty("SPRING_MAIL_PASSWORD", dotenv.get("SPRING_MAIL_PASSWORD"));
 		SpringApplication.run(SharemeApplication.class, args);
-		System.out.println();
 	}
 
 	@Bean
