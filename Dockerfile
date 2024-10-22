@@ -3,6 +3,6 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim
-COPY --from=build /target/shareme-backend-0.0.1-SNAPSHOT.jar shareme-backend.jar
+COPY --from=build /target/shareme-0.0.1-SNAPSHOT.jar shareme.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","shareme-backend.jar"]
+ENTRYPOINT ["java","-jar","shareme.jar"]
