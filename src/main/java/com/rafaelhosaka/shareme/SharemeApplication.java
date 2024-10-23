@@ -26,10 +26,10 @@ public class SharemeApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(UserProfileService userService){
+	CommandLineRunner run(ApplicationUserService userService){
 		return  args -> {
-//			userService.saveRole(new Role(null, "ROLE_USER"));
-//			userService.saveRole(new Role(null, "ROLE_ADMIN"));
+			userService.saveRole(new Role(null, "ROLE_USER"));
+			userService.saveRole(new Role(null, "ROLE_ADMIN"));
 //
 //			userService.saveUser(new ApplicationUser(null, "rafaelhosaka@shareme.com", "1234", new ArrayList<>()));
 //			userService.saveUser(new ApplicationUser(null, "admin@shareme.com", "admin", new ArrayList<>()));
