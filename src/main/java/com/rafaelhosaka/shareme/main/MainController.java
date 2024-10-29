@@ -13,6 +13,6 @@ public class MainController {
 
     @GetMapping
     public String getVersion(){
-        return "Rafael Hideki Hosaka © 2022 ShareMe "+buildVersion;
+        return "Rafael Hideki Hosaka © 2024 ShareMe "+buildVersion;
     }
 }
